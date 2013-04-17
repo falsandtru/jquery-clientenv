@@ -1,0 +1,475 @@
+/*
+ * 
+ * clientenv
+ * 
+ * ---
+ * @Copyright(c) 2013, falsandtru
+ * @license MIT  http://opensource.org/licenses/mit-license.php  http://sourceforge.jp/projects/opensource/wiki/licenses%2FMIT_license
+ * @version 0.0.0
+ * @updated 2013/04/17
+ * @author falsandtru  http://fat.main.jp/  http://sa-kusaku.sakura.ne.jp/
+ * @CodingConventions Google JavaScript Style Guide
+ * ---
+ * Note: 
+ * 
+ * ---
+ * Example:
+ * @jquery 1.7.2
+ * 
+ * $.clientenv();
+ * $.clientenv().is('os', 'windowsXP:lte');
+ * $.clientenv().addClass('browser').addClass('ie8:lte');
+ * $(function(){ $.clientenv({'font':'Meiryo, "メイリオ"'}).addClass('font', 'Meiryo, メイリオ', 'meiryo'); });
+ * 
+ */
+
+( function() {
+  
+  if ( typeof window[ 'jQuery' ] === 'undefined' ) { return ; } ;
+  
+  var $ = jQuery = window[ 'jQuery' ] , undefined = void( 0 ) , win = window , doc = document , plugin_data = [ 'settings' ] ;
+  
+  jQuery.fn.clientenv = clientenv ;
+  jQuery.clientenv = clientenv ;
+  
+  function clientenv( options ) {
+    if ( typeof this === 'function' || this === win ) { return arguments.callee.apply( jQuery( 'html' ) , arguments ) ; } ;
+    
+    var
+      context = this ,
+      defaults = {
+        id : 0 ,
+        gns : 'clientenv' ,
+        ns : undefined ,
+        userAgent : win.navigator.userAgent ,
+        hardware : true ,
+        platform : true ,
+        os : true ,
+        browser : true ,
+        font : { family : jQuery( 'body' )[ 0 ] ? jQuery( 'body' ).css( 'font-family' ) : '' , symbol : true , lang : 'en' } ,
+        attribute : true ,
+        support : true ,
+        strict : { ie : false } ,
+        not : true ,
+        response : {} ,
+        options : options
+      } ,
+      settings = jQuery.extend( true , {} , defaults , options ) ;
+    
+    if ( 1 === plugin_data.length || arguments.length ) {
+      settings.id = 1 ;
+      
+      jQuery.extend
+      (
+        true ,
+        settings , {
+          nss : {
+            class4html : [ settings.gns + ( settings.ns ? '-' + settings.ns : '' ) ].join( '.' )
+          } ,
+          context : this ,
+          response : {
+            clientenv : clientenv ,
+            addClass : addClass ,
+            removeClass : removeClass ,
+            is : is ,
+            reset : reset ,
+            end : function() { return context ; }
+          }
+        }
+      ) ;
+      
+      register( settings ) ;
+    } ;
+    
+    return 1 < plugin_data.length ? plugin_data[ 1 ].response : undefined ;
+    
+    
+    /* function */
+    
+    function register( settings ) {
+      var
+        userAgent = settings.userAgent.toLowerCase() ,
+        result = plugin_data[ 1 ] ? plugin_data[ 1 ].response : {} ,
+        property ;
+      
+      OS : {
+        if ( plugin_data[ 1 ] && ( !settings.options || !settings.options.os ) ) { break OS ; } ;
+        
+        result.os = {
+          windows8          : /Win(dows )?NT 6\.2/i.test( userAgent ) && 0 > userAgent.indexOf( 'arm' ) ,
+          windowsRT         : /Win(dows )?NT 6\.2/i.test( userAgent ) && -1 < userAgent.indexOf( 'arm' ) ,
+          windows7          : /Win(dows )?NT 6\.1/i.test( userAgent ) ,
+          windowsVista      : /Win(dows )?NT 6\.0/i.test( userAgent ) ,
+          windowsServer2003 : /Win(dows )?NT 5\.2/i.test( userAgent ) ,
+          windowsXP         : /Win(dows )?(NT 5\.1|XP)/i.test( userAgent ) ,
+          windowsME         : /Win(dows )?(9x 4\.90|ME)/i.test( userAgent ) ,
+          windows2000       : /Win(dows )?(NT 5\.0|2000)/i.test( userAgent ) ,
+          windows98         : /Win(dows )?98/i.test( userAgent ) ,
+          windowsNT         : /Win(dows )?NT( [3-4]\.0| [^0-9]+[^.])/i.test( userAgent ) ,
+          windows95         : /Win(dows )?95/i.test( userAgent ) ,
+          'osx10.8'         : /Mac OS X 10[._]8/i.test( userAgent ) ,
+          'osx10.7'         : /Mac OS X 10[._]7/i.test( userAgent ) ,
+          'osx10.6'         : /Mac OS X 10[._]6/i.test( userAgent ) ,
+          'osx10.5'         : /Mac OS X 10[._]5/i.test( userAgent ) ,
+          'osx10.4'         : /Mac OS X 10[._]4/i.test( userAgent ) ,
+          'osx10.3'         : /Mac OS X 10[._]3/i.test( userAgent ) ,
+          'osx10.2'         : /Mac OS X 10[._]2/i.test( userAgent ) ,
+          'osx10.1'         : /Mac OS X 10[._]1/i.test( userAgent ) ,
+          'osx10.0'         : /Mac OS X 10[._]0/i.test( userAgent ) ,
+          ios               : -1 < userAgent.indexOf( 'iphone os' ) || -1 < userAgent.indexOf( 'like mac OS x' ) ,
+          android           : -1 < userAgent.indexOf( 'android' ) ,
+          windowsPhone      : -1 < userAgent.indexOf( 'windows phone' ) ,
+          blackberry        : -1 < userAgent.indexOf( 'blackberry' ) ,
+          otherOS           : false
+        } ;
+        
+        property = result.os ;
+        for ( var i in property ) { if ( !property[ i ] || i === 'name' ) { continue ; } ; property.name = i ; } ;
+        if ( !result.os.name ) { result.os.name = 'otherOS' ; result.os.otherOS = true ; } ;
+      } ;
+      
+      PLATFORM : {
+        if ( plugin_data[ 1 ] && ( !settings.options || !settings.options.platform ) ) { break PLATFORM ; } ;
+        
+        result.platform = {
+          windows : -1 < userAgent.indexOf( 'windows' ) ,
+          mac     : -1 < userAgent.indexOf( 'macintosh' ) ,
+          android : -1 < userAgent.indexOf( 'android' ) ,
+          iphone  : -1 < userAgent.indexOf( 'iphone' ) ,
+          ipad    : -1 < userAgent.indexOf( 'ipad' ) ,
+          ipod    : -1 < userAgent.indexOf( 'ipod' ) ,
+          ipod    : -1 < userAgent.indexOf( 'ipod' ) ,
+          wii     : -1 < userAgent.indexOf( 'nintendo wii' ) ,
+          ds      : -1 < userAgent.indexOf( 'nitro' ) ,
+          psp     : -1 < userAgent.indexOf( 'psp' ) ,
+          ps2     : -1 < userAgent.indexOf( 'ps2' ) ,
+          ps3     : -1 < userAgent.indexOf( 'playstation 3' ) ,
+          otherPlatform : false
+        } ;
+        
+        property = result.platform ;
+        for ( var i in property ) { if ( !property[ i ] || i === 'name' ) { continue ; } ; property.name = i ; } ;
+        if ( !result.platform.name ) { result.platform.name = 'otherPlatform' ; result.platform.otherPlatform = true ; } ;
+      } ;
+      
+      HARDWARE : {
+        if ( plugin_data[ 1 ] && ( !settings.options || !settings.options.hardware ) ) { break HARDWARE ; } ;
+        
+        result.hardware = {
+          pc     : result.platform.windows || result.platform.mac ,
+          mobile : -1 < userAgent.indexOf( 'mobile' ) ,
+          tablet : -1 < userAgent.indexOf( 'tablet' ) ,
+          game   : result.platform.wii || result.platform.ds || result.platform.psp || result.platform.ps2 || result.platform.ps3 ,
+          otherHardware : false
+        } ;
+        
+        property = result.hardware ;
+        for ( var i in property ) { if ( !property[ i ] || i === 'name' ) { continue ; } ; property.name = i ; } ;
+        if ( !result.hardware.name ) { result.hardware.name = 'otherHardware' ; result.hardware.otherHardware = true ; } ;
+      } ;
+      
+      BROWSER : {
+        if ( plugin_data[ 1 ] && ( !settings.options || !settings.options.browser ) ) { break BROWSER ; } ;
+        
+        result.browser = {
+          version   : ( userAgent.match( /.*(?:rv|webkit|chrome|safari|opera(?:\/.+ version)?|msie)[\/: ]([\d.]+)/ ) || [] )[ 1 ] ,
+          chrome    : -1 < userAgent.indexOf( 'chrome' ) ,
+          safari    : -1 < userAgent.indexOf( 'safari' ) && 0 > userAgent.indexOf( 'chrome' ) ,
+          opera     : -1 < userAgent.indexOf( 'opera' ) && !result.platform.wii && !result.platform.ds ,
+          firefox   : -1 < userAgent.indexOf( 'firefox' ) ,
+          mozilla   : -1 < userAgent.indexOf( 'mozilla' ) && 0 > userAgent.indexOf( 'compatible' ) && 0 > userAgent.indexOf( 'webkit' ) && 0 > userAgent.indexOf( 'firefox' ) ,
+          lunascape : -1 < userAgent.indexOf( 'lunascape' ) ,
+          sleipnir  : -1 < userAgent.indexOf( 'sleipnir' ) ,
+          ie        : -1 < userAgent.indexOf( 'msie' ) && 0 > userAgent.indexOf( 'opera' ) ,
+          otherBrowser : false
+        } ;
+        
+        for ( var i = 5 , element ; i <= 10 ; i++ ) { result.browser[ 'ie' + i ] = Boolean( 0 === result.browser.version.indexOf( i + '.' ) && 0 > userAgent.indexOf( 'opera' ) ) ; } ;
+        
+        if ( result.browser.ie && settings.strict.ie ) {
+          for ( var i = 5 , element ; i <= 9 ; i++ ) {
+            element = jQuery( '<!--[if IE ' + i + ']><wbr><![endif]-->' ) ;
+            result.browser[ 'ie' + i ] = Boolean( element.length && element[ 0 ].nodeType === 1 ) ;
+            element = null ;
+          } ;
+        } ;
+        
+        property = result.browser ;
+        for ( var i in property ) { if ( !property[ i ] || i === 'name' ) { continue ; } ; property.name = i ; } ;
+        if ( !result.browser.name ) { result.browser.name = 'otherBrowser' ; result.browser.otherBrowser = true ; } ;
+      } ;
+      
+      ATTRIBUTE : {
+        if ( plugin_data[ 1 ] && ( !settings.options || !settings.options.attribute ) ) { break ATTRIBUTE ; } ;
+        
+        result.attribute = {
+          name : '' ,
+          touch : -1 < userAgent.indexOf( 'touch' ) || result.hardware.tablet || result.platform.iphone || result.platform.ipad || result.platform.android
+        } ;
+      } ;
+      
+      FONT : {
+        if ( plugin_data[ 1 ] && plugin_data[ 1 ].response.font && ( !settings.options || !settings.options.font ) ) { break FONT ; } ;
+        
+        if ( !settings.font || !jQuery( 'body' ).length ) { break FONT ; } ;
+        
+        var body , base , element , style , fonts , text , alphanumeric , symbol , lang ;
+        
+        fonts = [ 'monospace' , 'fantasy' , 'cursive' , 'sans-serif' , 'serif' ]
+        
+        style = 'font-size: 72px !important; ' +
+                'font-style: normal !important; ' +
+                'font-weight: normal !important; ' +
+                'font-variant: normal !important; ' +
+                'letter-spacing: normal !important; ' +
+                'line-height: normal !important; ' +
+                'display: block !important; ' +
+                'visibility: hidden !important; ' +
+                'position: absolute !important; ' +
+                'top: -9999px !important; ' +
+                'left: -9999px !important; ' +
+                'width: auto !important; ' +
+                'height: auto !important; '
+        
+        alphanumeric = 'alphanumericmmmmmmmmm1234567890' ;
+        
+        symbol = settings.font.symbol ? '_!#$&:;@+-*/%=^\\(){}[]<>' : '' ;
+        
+        lang = {
+          en : 'environment' ,
+          ja : '環境　かんきょう　カンキョウ'
+        } ;
+        
+        text = alphanumeric + symbol + ( settings.font.lang in lang ? lang[ settings.font.lang ] : '' ) ;
+        
+        base = [] ;
+        base[ 0 ] = jQuery( '<pre/>' ).text( text ) ;
+        base[ 1 ] = jQuery( '<pre/>' ).text( text ) ;
+        
+        body = jQuery( 'body' ) ;
+        body.append( base[ 0 ] , base[ 1 ] ) ;
+        for ( var i = 0 ; i + 1 < fonts.length ; i++ ) {
+          base[ 0 ].attr( 'style' , 'font-family: ' + fonts.slice( i + 0 ).join( ', ' ) + ' !important; ' + style ) ;
+          base[ 1 ].attr( 'style' , 'font-family: ' + fonts.slice( i + 1 ).join( ', ' ) + ' !important; ' + style ) ;
+          if ( base[ 0 ][ 0 ].offsetWidth !== base[ 1 ][ 0 ].offsetWidth || base[ 0 ][ 0 ].offsetHeight !== base[ 1 ][ 0 ].offsetHeight ) {
+          } else {
+            fonts.splice( i-- , 1 ) ;
+          } ;
+        } ;
+        
+        base[ 0 ].attr( 'style' , 'font-family: ' + fonts.join( ', ' ) + ' !important; ' + style ) ;
+        base[ 1 ].attr( 'style' , 'font-family: ' + fonts.slice( 1 < fonts.length ? 1 : 0 ).join( ', ' ) + ' !important; ' + style ) ;
+        
+        style = fonts.join( ', ' ) + ' !important; ' + style ;
+        fonts = settings.font.family.split( /\s*,\s*/ )
+        result.font = { support : '' , support4style : '' , notsupport : '' , notsupport4style : '' } ;
+        
+        element = jQuery( '<pre/>' ).text( text ) ;
+        body.append( element ) ;
+        for ( var i = 0 , font , font4style ; font4style = fonts[ i ] ; i++ ) {
+          font = font4style.replace( /"|'/g , '' )
+          for ( var j = 0 , len = base.length , source , format ; source = base[ j ] ; j++ ) {
+            element.attr( 'style' , 'font-family: ' + font4style + ', ' + style.slice( !j ? 0 : style.indexOf( ', ' ) + 2 ) ) ;
+            if ( source[ 0 ].offsetWidth !== element[ 0 ].offsetWidth || source[ 0 ].offsetHeight !== element[ 0 ].offsetHeight ) {
+              result.font[ font ] = true ;
+              result.font.support += ',' + font ;
+              result.font.support4style += ',' + font4style ;
+              break ;
+            } else if ( j === len - 1 ) {
+              result.font[ font ] = false ;
+              result.font.notsupport += ',' + font ;
+              result.font.notsupport4style += ',' + font4style ;
+            } ;
+          } ;
+        } ;
+        
+        base[ 0 ].remove() ;
+        base[ 0 ] = null ;
+        base[ 1 ].remove() ;
+        base[ 1 ] = null ;
+        element.remove() ;
+        element = null ;
+        
+        result.font.support = result.font.support.slice( 1 ) ;
+        result.font.notsupport = result.font.notsupport.slice( 1 ) ;
+        result.font.support4style = result.font.support4style.slice( 1 ) ;
+        result.font.notsupport4style = result.font.notsupport4style.slice( 1 ) ;
+        result.font.name = result.font.support.split( /\s*,\s*/ , 2 )[ 0 ] ;
+      } ;
+      
+      SUPPORT : {
+        if ( !settings.support ) { break SUPPORT ; } ;
+        
+        result.support = jQuery.support ;
+      } ;
+      
+      jQuery.extend( true , settings.response , result ) ;
+      plugin_data[ 1 ] = settings ;
+    }
+    
+    function addClass( property , query , key ) {
+      var settings = plugin_data[ 1 ] ;
+      
+      if ( !settings.context || !property ) { return this ; } ;
+      
+      query = format( property.toLowerCase() , query ) ;
+      property = query[ 0 ] ;
+      query = query[ 1 ] ;
+      
+      key = key ? key : query ? query : reference( property , query ) ;
+      
+      if ( is( property , query ) ) {
+        settings.not && !key.indexOf( 'not-' ) ? null : jQuery( settings.context ).addClass( key ) ;
+      } else {
+        if ( query === undefined ) { return this ; } ;
+        settings.not && !key.indexOf( 'not-' ) ? null : jQuery( settings.context ).addClass( ( key.indexOf( 'not-' ) ? 'not-' : '' ) + key ) ;
+      } ;
+      
+      return this ;
+    }
+    
+    function removeClass( property , query , key ) {
+      var settings = plugin_data[ 1 ] ;
+      
+      if ( !settings.context || !property ) { return this ; } ;
+      
+      query = format( property.toLowerCase() , query ) ;
+      property = query[ 0 ] ;
+      query = query[ 1 ] ;
+      
+      key = key ? key : query ? query : reference( property , query ) ;
+      
+      if ( is( property , query ) ) {
+        settings.not && !key.indexOf( 'not-' ) ? null : jQuery( settings.context ).removeClass( key ) ;
+      } else {
+        if ( query === undefined ) { return this ; } ;
+        settings.not && !key.indexOf( 'not-' ) ? null : jQuery( settings.context ).removeClass( ( key.indexOf( 'not-' ) ? 'not-' : '' ) + key ) ;
+      } ;
+      
+      return this ;
+    }
+    
+    function is( property , query ) {
+      var settings = plugin_data[ 1 ] , properties , queries , result = 0 ;
+      
+      properties = property.toLowerCase().replace( /"|'/g , '' ).split( /\s*,\s*/ ) ;
+      queries = query === undefined || query === 'name' ? [ 'name' ] : query.replace( /"|'/g , '' ).split( /\s*,\s*/ ) ;
+      for ( var i = 0 , property ; property = properties[ i ] ; i++ ) {
+        for ( var j = 0 , query ; query = queries[ j ] ; j++ ) {
+          query = format( property , query ) ;
+          property = query[ 0 ] ;
+          query = query[ 1 ] ;
+          
+          result += reference( property , query ) ? 1 : 0 ;
+        } ;
+      } ;
+      result = query !== undefined && 0 === query.indexOf( 'not-' ) ? !result : result ;
+      return result ? this : undefined ;
+    }
+    
+    function format( property , query ) {
+      if ( property in settings.response && query ) {
+        query = query ? query.replace( /(not-|)(\S+):(\S+)/ , '$1$3-$2' ) : query ;
+      } else {
+        property = property ? property.replace( /(not-|)(\S+):(\S+)/ , '$1$3-$2' ) : property ;
+        queries = [ property.split( /(?:lte|lt|gte|gt)-/ ).pop() ] ;
+        query = undefined ;
+        for ( var i in settings.response ) {
+          if ( queries[ 0 ] in settings.response[ i ] ) {
+            query = property ;
+            property = i ;
+          } ;
+        } ;
+      } ;
+      return [ property , query ] ;
+    }
+    
+    function reference( property , query ) {
+      var settings = plugin_data[ 1 ] , list , location = [ undefined , undefined ] , result ;
+      
+      queries = query === undefined ? [ query ] : query.replace( /(not|)-?(lte|lt|gte|gt|)-?(\S+)/ , '$3,$2,$1' ).split( ',' ) ;
+      queries[ 2 ] = queries[ 2 ] === 'not' ? false : true ;
+      
+      switch ( true ) {
+        case !query || 0 > query.indexOf( '-' ) :
+          return queries[ 2 ] ? settings.response[ property ][ query ? query : 'name' ] : undefined ;
+          break ;
+          
+        case property === 'os' && !queries[ 0 ].indexOf( 'windows' ) :
+          list = [
+              'windows8' ,
+              'windowsRT' ,
+              'windows7' ,
+              'windowsVista' ,
+              'windowsServer2003' ,
+              'windowsXP' ,
+              'windowsME' ,
+              'windows2000' ,
+              'windows98' ,
+              'windowsNT' ,
+              'windows95'
+          ] ;
+          break ;
+          
+        case property === 'os' && !queries[ 0 ].indexOf( 'osx' ) :
+          list = [
+              'osx10.8' ,
+              'osx10.7' ,
+              'osx10.6' ,
+              'osx10.5' ,
+              'osx10.4' ,
+              'osx10.3' ,
+              'osx10.2' ,
+              'osx10.1' ,
+              'osx10.0'
+          ] ;
+          break ;
+          
+        case property === 'browser' && !queries[ 0 ].indexOf( 'ie' ) :
+          list = [
+              'ie10' ,
+              'ie9' ,
+              'ie8' ,
+              'ie7' ,
+              'ie6' ,
+              'ie5'
+          ] ;
+          break ;
+          
+        default :
+          return undefined ;
+      } ;
+      
+      for ( var i = 0 , value ; value = list[ i ] ; i++ ) {
+        if ( settings.response[ property ][ 'name' ] === value ) { location[ 0 ] = i ; } ;
+        if ( queries[ 0 ] === value ) { location[ 0 ] = i ; } ;
+      } ;
+      
+      if ( undefined in location ) { return undefined ; } ;
+      
+      switch ( queries[ 1 ] ) {
+        case 'gt' :
+          result = location[ 0 ] < location[ 1 ] ;
+          
+        case 'gte' :
+          result = location[ 0 ] <= location[ 1 ] ;
+          
+        case 'lt' :
+          result = location[ 0 ] > location[ 1 ] ;
+          
+        case 'lte' :
+          result = location[ 0 ] >= location[ 1 ] ;
+          
+        default :
+          return undefined ;
+      } ;
+      return queries[ 2 ] ? result : !result ;
+    }
+    
+    function reset( options ) {
+      1 < plugin_data.length ? plugin_data.splice( 1 , 1 ) : null ;
+      clientenv( options ) ;
+      return 1 < plugin_data.length ? plugin_data[ 1 ].response : undefined ;
+    }
+  }
+} )() ;
