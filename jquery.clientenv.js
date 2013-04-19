@@ -5,7 +5,7 @@
  * ---
  * @Copyright(c) 2013, falsandtru
  * @license MIT  http://opensource.org/licenses/mit-license.php  http://sourceforge.jp/projects/opensource/wiki/licenses%2FMIT_license
- * @version 0.0.1
+ * @version 0.0.2
  * @updated 2013/04/19
  * @author falsandtru  http://fat.main.jp/  http://sa-kusaku.sakura.ne.jp/
  * @CodingConventions Google JavaScript Style Guide
@@ -335,21 +335,23 @@
     }
     
     function removeClass( property , query , key ) {
-      var settings = plugin_data[ 1 ] ;
+      var settings = plugin_data[ 1 ] , classname ;
       
       if ( !settings.context || !property ) { return this ; } ;
       
-      query = format( property , query ) ;
-      property = query[ 0 ] ;
-      query = query[ 1 ] ;
-      
-      key = key ? key : query ? query : reference( property , query ) ;
-      
-      if ( is( property , query ) ) {
-        settings.not && !key.indexOf( 'not-' ) ? null : jQuery( settings.context ).removeClass( key ) ;
-      } else {
-        if ( query === undefined ) { return this ; } ;
-        settings.not && !key.indexOf( 'not-' ) ? null : jQuery( settings.context ).removeClass( ( key.indexOf( 'not-' ) ? 'not-' : '' ) + key ) ;
+      for ( var i = 0 , properties = property.split( /\s+/ ) ; property = properties[ i ] ; i++ ) {
+        query = format( property , query ) ;
+        property = query[ 0 ] ;
+        query = query[ 1 ] ;
+        
+        classname = key ? key : query ? query : reference( property , query ) ;
+        
+        if ( is( property , query ) ) {
+          settings.not && !classname.indexOf( 'not-' ) ? null : jQuery( settings.context ).removeClass( classname ) ;
+        } else {
+          if ( query === undefined ) { return this ; } ;
+          settings.not && !classname.indexOf( 'not-' ) ? null : jQuery( settings.context ).removeClass( ( classname.indexOf( 'not-' ) ? 'not-' : '' ) + classname ) ;
+        } ;
       } ;
       
       return this ;
