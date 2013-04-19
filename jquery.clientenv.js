@@ -5,8 +5,8 @@
  * ---
  * @Copyright(c) 2013, falsandtru
  * @license MIT  http://opensource.org/licenses/mit-license.php  http://sourceforge.jp/projects/opensource/wiki/licenses%2FMIT_license
- * @version 0.0.0
- * @updated 2013/04/17
+ * @version 0.0.1
+ * @updated 2013/04/19
  * @author falsandtru  http://fat.main.jp/  http://sa-kusaku.sakura.ne.jp/
  * @CodingConventions Google JavaScript Style Guide
  * ---
@@ -32,7 +32,9 @@
   jQuery.fn.clientenv = clientenv ;
   jQuery.clientenv = clientenv ;
   
+  
   function clientenv( options ) {
+    
     if ( typeof this === 'function' || this === win ) { return arguments.callee.apply( jQuery( 'html' ) , arguments ) ; } ;
     
     var
@@ -51,7 +53,6 @@
         support : true ,
         strict : { ie : false } ,
         not : true ,
-        response : {} ,
         options : options
       } ,
       settings = jQuery.extend( true , {} , defaults , options ) ;
@@ -240,7 +241,10 @@
           ja : '環境　かんきょう　カンキョウ'
         } ;
         
-        text = alphanumeric + symbol + ( settings.font.lang in lang ? lang[ settings.font.lang ] : '' ) ;
+        text = alphanumeric + symbol ;
+        for ( var i = 0 , keys = settings.font.lang.split( /\s*,\s*/ ) , key ; key = keys[ i ] ; i++ ) {
+          if ( key in lang ) { text += lang[ key ] ; } ;
+        } ;
         
         base = [] ;
         base[ 0 ] = jQuery( '<pre/>' ).text( text ) ;
@@ -308,21 +312,23 @@
     }
     
     function addClass( property , query , key ) {
-      var settings = plugin_data[ 1 ] ;
+      var settings = plugin_data[ 1 ] , classname ;
       
       if ( !settings.context || !property ) { return this ; } ;
       
-      query = format( property.toLowerCase() , query ) ;
-      property = query[ 0 ] ;
-      query = query[ 1 ] ;
-      
-      key = key ? key : query ? query : reference( property , query ) ;
-      
-      if ( is( property , query ) ) {
-        settings.not && !key.indexOf( 'not-' ) ? null : jQuery( settings.context ).addClass( key ) ;
-      } else {
-        if ( query === undefined ) { return this ; } ;
-        settings.not && !key.indexOf( 'not-' ) ? null : jQuery( settings.context ).addClass( ( key.indexOf( 'not-' ) ? 'not-' : '' ) + key ) ;
+      for ( var i = 0 , properties = property.split( /\s+/ ) ; property = properties[ i ] ; i++ ) {
+        query = format( property , query ) ;
+        property = query[ 0 ] ;
+        query = query[ 1 ] ;
+        
+        classname = key ? key : query ? query : reference( property , query ) ;
+        
+        if ( is( property , query ) ) {
+          settings.not && !classname.indexOf( 'not-' ) ? null : jQuery( settings.context ).addClass( classname ) ;
+        } else {
+          if ( query === undefined ) { return this ; } ;
+          settings.not && !classname.indexOf( 'not-' ) ? null : jQuery( settings.context ).addClass( ( classname.indexOf( 'not-' ) ? 'not-' : '' ) + classname ) ;
+        } ;
       } ;
       
       return this ;
@@ -333,7 +339,7 @@
       
       if ( !settings.context || !property ) { return this ; } ;
       
-      query = format( property.toLowerCase() , query ) ;
+      query = format( property , query ) ;
       property = query[ 0 ] ;
       query = query[ 1 ] ;
       
@@ -352,7 +358,7 @@
     function is( property , query ) {
       var settings = plugin_data[ 1 ] , properties , queries , result = 0 ;
       
-      properties = property.toLowerCase().replace( /"|'/g , '' ).split( /\s*,\s*/ ) ;
+      properties = property.replace( /"|'/g , '' ).split( /\s*,\s*/ ) ;
       queries = query === undefined || query === 'name' ? [ 'name' ] : query.replace( /"|'/g , '' ).split( /\s*,\s*/ ) ;
       for ( var i = 0 , property ; property = properties[ i ] ; i++ ) {
         for ( var j = 0 , query ; query = queries[ j ] ; j++ ) {
@@ -370,12 +376,12 @@
     function format( property , query ) {
       if ( property in settings.response && query ) {
         query = query ? query.replace( /(not-|)(\S+):(\S+)/ , '$1$3-$2' ) : query ;
+      } else if ( property in settings.response ) {
       } else {
         property = property ? property.replace( /(not-|)(\S+):(\S+)/ , '$1$3-$2' ) : property ;
-        queries = [ property.split( /(?:lte|lt|gte|gt)-/ ).pop() ] ;
-        query = undefined ;
+        query = [ property.split( /(?:lte|lt|gte|gt)-/ ).pop() ][ 0 ] ;
         for ( var i in settings.response ) {
-          if ( queries[ 0 ] in settings.response[ i ] ) {
+          if ( query in settings.response[ i ] ) {
             query = property ;
             property = i ;
           } ;
@@ -385,7 +391,7 @@
     }
     
     function reference( property , query ) {
-      var settings = plugin_data[ 1 ] , list , location = [ undefined , undefined ] , result ;
+      var settings = plugin_data[ 1 ] , queries , list , position = [ undefined , undefined ] , result ;
       
       queries = query === undefined ? [ query ] : query.replace( /(not|)-?(lte|lt|gte|gt|)-?(\S+)/ , '$3,$2,$1' ).split( ',' ) ;
       queries[ 2 ] = queries[ 2 ] === 'not' ? false : true ;
@@ -441,24 +447,28 @@
       } ;
       
       for ( var i = 0 , value ; value = list[ i ] ; i++ ) {
-        if ( settings.response[ property ][ 'name' ] === value ) { location[ 0 ] = i ; } ;
-        if ( queries[ 0 ] === value ) { location[ 0 ] = i ; } ;
+        if ( settings.response[ property ][ 'name' ] === value ) { position[ 0 ] = i ; } ;
+        if ( queries[ 0 ] === value ) { position[ 1 ] = i ; } ;
       } ;
       
-      if ( undefined in location ) { return undefined ; } ;
+      if ( undefined in position ) { return undefined ; } ;
       
       switch ( queries[ 1 ] ) {
         case 'gt' :
-          result = location[ 0 ] < location[ 1 ] ;
+          result = position[ 0 ] < position[ 1 ] ;
+          break ;
           
         case 'gte' :
-          result = location[ 0 ] <= location[ 1 ] ;
+          result = position[ 0 ] <= position[ 1 ] ;
+          break ;
           
         case 'lt' :
-          result = location[ 0 ] > location[ 1 ] ;
+          result = position[ 0 ] > position[ 1 ] ;
+          break ;
           
         case 'lte' :
-          result = location[ 0 ] >= location[ 1 ] ;
+          result = position[ 0 ] >= position[ 1 ] ;
+          break ;
           
         default :
           return undefined ;
