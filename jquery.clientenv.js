@@ -5,8 +5,8 @@
  * ---
  * @Copyright(c) 2013, falsandtru
  * @license MIT  http://opensource.org/licenses/mit-license.php  http://sourceforge.jp/projects/opensource/wiki/licenses%2FMIT_license
- * @version 0.0.4
- * @updated 2013/04/19
+ * @version 0.0.5
+ * @updated 2013/04/20
  * @author falsandtru  http://fat.main.jp/  http://sa-kusaku.sakura.ne.jp/
  * @CodingConventions Google JavaScript Style Guide
  * ---
@@ -122,9 +122,7 @@
           'osx10.1'         : /Mac OS X 10[._]1/i.test( userAgent ) ,
           'osx10.0'         : /Mac OS X 10[._]0/i.test( userAgent ) ,
           ios               : -1 < userAgent.indexOf( 'iphone os' ) || -1 < userAgent.indexOf( 'like mac OS x' ) ,
-          android           : -1 < userAgent.indexOf( 'android' ) ,
-          windowsPhone      : -1 < userAgent.indexOf( 'windows phone' ) ,
-          blackberry        : -1 < userAgent.indexOf( 'blackberry' ) ,
+          androidos         : -1 < userAgent.indexOf( 'android' ) ,
           otherOS           : false
         } ;
         
@@ -137,17 +135,19 @@
         if ( plugin_data[ 1 ] && ( !settings.options || !settings.options.platform ) ) { break PLATFORM ; } ;
         
         result.platform = {
-          windows : -1 < userAgent.indexOf( 'windows' ) ,
-          mac     : -1 < userAgent.indexOf( 'macintosh' ) ,
-          android : -1 < userAgent.indexOf( 'android' ) ,
-          iphone  : -1 < userAgent.indexOf( 'iphone' ) ,
-          ipad    : -1 < userAgent.indexOf( 'ipad' ) ,
-          ipod    : -1 < userAgent.indexOf( 'ipod' ) ,
-          wii     : -1 < userAgent.indexOf( 'nintendo wii' ) ,
-          ds      : -1 < userAgent.indexOf( 'nitro' ) ,
-          psp     : -1 < userAgent.indexOf( 'psp' ) ,
-          ps2     : -1 < userAgent.indexOf( 'ps2' ) ,
-          ps3     : -1 < userAgent.indexOf( 'playstation 3' ) ,
+          windows      : -1 < userAgent.indexOf( 'windows' ) ,
+          mac          : -1 < userAgent.indexOf( 'macintosh' ) ,
+          android      : -1 < userAgent.indexOf( 'android' ) ,
+          iphone       : -1 < userAgent.indexOf( 'iphone' ) ,
+          ipad         : -1 < userAgent.indexOf( 'ipad' ) ,
+          ipod         : -1 < userAgent.indexOf( 'ipod' ) ,
+          windowsPhone : -1 < userAgent.indexOf( 'windows phone' ) ,
+          blackberry   : -1 < userAgent.indexOf( 'blackberry' ) ,
+          wii          : -1 < userAgent.indexOf( 'nintendo wii' ) ,
+          ds           : -1 < userAgent.indexOf( 'nitro' ) ,
+          psp          : -1 < userAgent.indexOf( 'psp' ) ,
+          ps2          : -1 < userAgent.indexOf( 'ps2' ) ,
+          ps3          : -1 < userAgent.indexOf( 'playstation 3' ) ,
           otherPlatform : false
         } ;
         
