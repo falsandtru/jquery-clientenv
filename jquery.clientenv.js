@@ -5,7 +5,7 @@
  * ---
  * @Copyright(c) 2013, falsandtru
  * @license MIT  http://opensource.org/licenses/mit-license.php  http://sourceforge.jp/projects/opensource/wiki/licenses%2FMIT_license
- * @version 0.0.2
+ * @version 0.0.3
  * @updated 2013/04/19
  * @author falsandtru  http://fat.main.jp/  http://sa-kusaku.sakura.ne.jp/
  * @CodingConventions Google JavaScript Style Guide
@@ -69,6 +69,7 @@
           } ,
           context : this ,
           response : {
+            0 : this[ 0 ] ,
             clientenv : clientenv ,
             addClass : addClass ,
             removeClass : removeClass ,
@@ -80,6 +81,9 @@
       ) ;
       
       register( settings ) ;
+    } else {
+      plugin_data[ 1 ].context = this ;
+      plugin_data[ 1 ].response[ 0 ] = this[ 0 ] ;
     } ;
     
     return 1 < plugin_data.length ? plugin_data[ 1 ].response : undefined ;
@@ -139,7 +143,6 @@
           iphone  : -1 < userAgent.indexOf( 'iphone' ) ,
           ipad    : -1 < userAgent.indexOf( 'ipad' ) ,
           ipod    : -1 < userAgent.indexOf( 'ipod' ) ,
-          ipod    : -1 < userAgent.indexOf( 'ipod' ) ,
           wii     : -1 < userAgent.indexOf( 'nintendo wii' ) ,
           ds      : -1 < userAgent.indexOf( 'nitro' ) ,
           psp     : -1 < userAgent.indexOf( 'psp' ) ,
@@ -188,6 +191,7 @@
         for ( var i = 5 , element ; i <= 10 ; i++ ) { result.browser[ 'ie' + i ] = Boolean( 0 === result.browser.version.indexOf( i + '.' ) && 0 > userAgent.indexOf( 'opera' ) ) ; } ;
         
         if ( result.browser.ie && settings.strict.ie ) {
+          result.browser[ 'ie' ] = Boolean( jQuery( '<!--[if IE ]><wbr><![endif]-->' ).length && jQuery( '<!--[if IE ]><wbr><![endif]-->' )[ 0 ].nodeType === 1 ) ;
           for ( var i = 5 , element ; i <= 9 ; i++ ) {
             element = jQuery( '<!--[if IE ' + i + ']><wbr><![endif]-->' ) ;
             result.browser[ 'ie' + i ] = Boolean( element.length && element[ 0 ].nodeType === 1 ) ;
@@ -314,7 +318,7 @@
     function addClass( property , query , key ) {
       var settings = plugin_data[ 1 ] , classname ;
       
-      if ( !settings.context || !property ) { return this ; } ;
+      if ( !settings.response[ 0 ] || !property ) { return this ; } ;
       
       for ( var i = 0 , properties = property.split( /\s+/ ) ; property = properties[ i ] ; i++ ) {
         query = format( property , query ) ;
@@ -323,11 +327,11 @@
         
         classname = key ? key : query ? query : reference( property , query ) ;
         
-        if ( is( property , query ) ) {
-          settings.not && !classname.indexOf( 'not-' ) ? null : jQuery( settings.context ).addClass( classname ) ;
+        if ( is( property , query , true ) ) {
+          !settings.not && !classname.indexOf( 'not-' ) ? null : jQuery( plugin_data[ 1 ].response[ 0 ] ).addClass( classname ) ;
         } else {
           if ( query === undefined ) { return this ; } ;
-          settings.not && !classname.indexOf( 'not-' ) ? null : jQuery( settings.context ).addClass( ( classname.indexOf( 'not-' ) ? 'not-' : '' ) + classname ) ;
+          !settings.not ? null : jQuery( plugin_data[ 1 ].response[ 0 ] ).addClass( ( classname.indexOf( 'not-' ) ? 'not-' : '' ) + classname ) ;
         } ;
       } ;
       
@@ -337,7 +341,7 @@
     function removeClass( property , query , key ) {
       var settings = plugin_data[ 1 ] , classname ;
       
-      if ( !settings.context || !property ) { return this ; } ;
+      if ( !settings.response[ 0 ] || !property ) { return this ; } ;
       
       for ( var i = 0 , properties = property.split( /\s+/ ) ; property = properties[ i ] ; i++ ) {
         query = format( property , query ) ;
@@ -346,18 +350,18 @@
         
         classname = key ? key : query ? query : reference( property , query ) ;
         
-        if ( is( property , query ) ) {
-          settings.not && !classname.indexOf( 'not-' ) ? null : jQuery( settings.context ).removeClass( classname ) ;
+        if ( is( property , query , true ) ) {
+          !settings.not && !classname.indexOf( 'not-' ) ? null : jQuery( plugin_data[ 1 ].response[ 0 ] ).removeClass( classname ) ;
         } else {
           if ( query === undefined ) { return this ; } ;
-          settings.not && !classname.indexOf( 'not-' ) ? null : jQuery( settings.context ).removeClass( ( classname.indexOf( 'not-' ) ? 'not-' : '' ) + classname ) ;
+          !settings.not ? null : jQuery( plugin_data[ 1 ].response[ 0 ] ).removeClass( ( classname.indexOf( 'not-' ) ? 'not-' : '' ) + classname ) ;
         } ;
       } ;
       
       return this ;
     }
     
-    function is( property , query ) {
+    function is( property , query , boolean ) {
       var settings = plugin_data[ 1 ] , properties , queries , result = 0 ;
       
       properties = property.replace( /"|'/g , '' ).split( /\s*,\s*/ ) ;
@@ -372,16 +376,19 @@
         } ;
       } ;
       result = query !== undefined && 0 === query.indexOf( 'not-' ) ? !result : result ;
-      return result ? this : undefined ;
+      if ( !result && !boolean ) { delete plugin_data[ 1 ].response[ 0 ] ; } ;
+      return boolean ? Boolean( result ) : plugin_data[ 1 ].response ;
     }
     
     function format( property , query ) {
       if ( property in settings.response && query ) {
-        query = query ? query.replace( /(not-|)(\S+):(\S+)/ , '$1$3-$2' ) : query ;
+        query = query ? query.replace( /(\S+):(\S+)/ , '$2-$1' ) : query ;
+        query = query ? query.replace( /(\w+)-(not-)/ , '$2-$1' ) : query ;
       } else if ( property in settings.response ) {
       } else {
-        property = property ? property.replace( /(not-|)(\S+):(\S+)/ , '$1$3-$2' ) : property ;
-        query = [ property.split( /(?:lte|lt|gte|gt)-/ ).pop() ][ 0 ] ;
+        property = property ? property.replace( /(\S+):(\S+)/ , '$2-$1' ) : property ;
+        property = property ? property.replace( /(\w+)-(not-)/ , '$2-$1' ) : property ;
+        query = [ property.split( /(?:not|lte|lt|gte|gt)-/ ).pop() ][ 0 ] ;
         for ( var i in settings.response ) {
           if ( query in settings.response[ i ] ) {
             query = property ;
@@ -400,7 +407,13 @@
       
       switch ( true ) {
         case !query || 0 > query.indexOf( '-' ) :
-          return queries[ 2 ] ? settings.response[ property ][ query ? query : 'name' ] : undefined ;
+          query = query ? query : 'name' ;
+          if ( settings.response[ property ] && query in settings.response[ property ] ) {
+            result = settings.response[ property ][ query ] ;
+          } else {
+            result = undefined
+          } ;
+          return queries[ 2 ] ? result : !result ;
           break ;
           
         case property === 'os' && !queries[ 0 ].indexOf( 'windows' ) :
