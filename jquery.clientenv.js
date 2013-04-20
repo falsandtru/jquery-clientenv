@@ -5,8 +5,8 @@
  * ---
  * @Copyright(c) 2013, falsandtru
  * @license MIT  http://opensource.org/licenses/mit-license.php  http://sourceforge.jp/projects/opensource/wiki/licenses%2FMIT_license
- * @version 0.0.5
- * @updated 2013/04/20
+ * @version 0.0.6
+ * @updated 2013/04/21
  * @author falsandtru  http://fat.main.jp/  http://sa-kusaku.sakura.ne.jp/
  * @CodingConventions Google JavaScript Style Guide
  * ---
@@ -55,7 +55,8 @@
         not : true ,
         options : options
       } ,
-      settings = jQuery.extend( true , {} , defaults , options ) ;
+      settings = jQuery.extend( true , {} , defaults , options ) ,
+      nsArray = [ settings.gns ].concat( settings.ns || [] ) ;
     
     if ( 1 === plugin_data.length || arguments.length ) {
       settings.id = 1 ;
@@ -65,7 +66,7 @@
         true ,
         settings , {
           nss : {
-            class4html : [ settings.gns + ( settings.ns ? '-' + settings.ns : '' ) ].join( '.' )
+            class4html : nsArray.join( '-' )
           } ,
           context : this ,
           response : {
@@ -325,7 +326,7 @@
         fproperty = result[ 0 ] ;
         fquery = result[ 1 ] ;
         
-        classname = key ? key : fquery ? fquery : reference( fproperty , fquery ) ;
+        classname = key || fquery || reference( fproperty , fquery ) ;
         
         if ( is( fproperty , fquery , true ) ) {
           !settings.not && !classname.indexOf( 'not-' ) ? null : jQuery( plugin_data[ 1 ].response[ 0 ] ).addClass( classname ) ;
@@ -348,7 +349,7 @@
         fproperty = result[ 0 ] ;
         fquery = result[ 1 ] ;
         
-        classname = key ? key : fquery ? fquery : reference( fproperty , fquery ) ;
+        classname = key || fquery || reference( fproperty , fquery ) ;
         
         if ( is( fproperty , fquery , true ) ) {
           !settings.not && !classname.indexOf( 'not-' ) ? null : jQuery( plugin_data[ 1 ].response[ 0 ] ).removeClass( classname ) ;
@@ -492,7 +493,7 @@
     }
     
     function reset( options ) {
-      1 < plugin_data.length ? plugin_data.splice( 1 , 1 ) : null ;
+      1 < plugin_data.length && plugin_data.splice( 1 , 1 ) ;
       clientenv( options ) ;
       return 1 < plugin_data.length ? plugin_data[ 1 ].response : undefined ;
     }
