@@ -5,8 +5,8 @@
  * ---
  * @Copyright(c) 2013, falsandtru
  * @license MIT  http://opensource.org/licenses/mit-license.php  http://sourceforge.jp/projects/opensource/wiki/licenses%2FMIT_license
- * @version 0.0.6
- * @updated 2013/04/21
+ * @version 0.0.7
+ * @updated 2013/04/24
  * @author falsandtru  http://fat.main.jp/  http://sa-kusaku.sakura.ne.jp/
  * @CodingConventions Google JavaScript Style Guide
  * ---
@@ -37,6 +37,11 @@
     
     if ( typeof this === 'function' || this === win ) { return arguments.callee.apply( jQuery( 'html' ) , arguments ) ; } ;
     
+    /* validate */ var validate = typeof window.validate === 'object' ? window.validate : false ;
+    /* validate */ var validate = validate ? validate.clone( { name : 'jquery.clientenv.js' } ) : validate ;
+    /* validate */ validate && validate.start() ;
+    /* validate */ validate && validate.test( 1, 1, 0, 'plugin load' ) ;
+    
     var
       context = this ,
       defaults = {
@@ -66,26 +71,35 @@
         true ,
         settings , {
           nss : {
-            class4html : nsArray.join( '-' )
+            class4html : nsArray.join( '-' ) ,
+            array : nsArray
           } ,
           context : this ,
           response : {
             0 : this[ 0 ] ,
+            not : settings.not ,
+            userAgent : settings.userAgent ,
             clientenv : clientenv ,
             addClass : addClass ,
             removeClass : removeClass ,
             is : is ,
+            data : data ,
             reset : reset ,
             end : function() { return context ; }
-          }
+          } ,
+          validate : validate
         }
       ) ;
       
       register( settings ) ;
+      plugin_data[ 1 ] = settings ;
     } else {
       plugin_data[ 1 ].context = this ;
       plugin_data[ 1 ].response[ 0 ] = this[ 0 ] ;
     } ;
+    
+    /* validate */ validate && validate.end() ;
+    /* validate */ validate && validate.remove() ;
     
     return 1 < plugin_data.length ? plugin_data[ 1 ].response : undefined ;
     
@@ -93,15 +107,21 @@
     /* function */
     
     function register( settings ) {
+      
+      /* validate */ validate && validate.test( 2, 1, 0, 'plugin register' ) ;
+      /* validate */ validate && validate.test( '2.1', 1, 0, 'variable' ) ;
+      
       var
         userAgent = settings.userAgent.toLowerCase() ,
-        result = plugin_data[ 1 ] ? plugin_data[ 1 ].response : {} ,
+        response = settings.response ,
         property ;
       
+      /* validate */ validate && validate.test( '2.2', 1, 0, 'os' ) ;
       OS : {
-        if ( plugin_data[ 1 ] && ( !settings.options || !settings.options.os ) ) { break OS ; } ;
+        if ( response.os && ( !settings.options || !settings.options.os ) ) { break OS ; } ;
         
-        result.os = {
+        response.os = {
+          name              : '' ,
           windows8          : /Win(dows )?NT 6\.2/i.test( userAgent ) && 0 > userAgent.indexOf( 'arm' ) ,
           windowsRT         : /Win(dows )?NT 6\.2/i.test( userAgent ) && -1 < userAgent.indexOf( 'arm' ) ,
           windows7          : /Win(dows )?NT 6\.1/i.test( userAgent ) ,
@@ -127,15 +147,17 @@
           otherOS           : false
         } ;
         
-        property = result.os ;
+        property = response.os ;
         for ( var i in property ) { if ( !property[ i ] || i === 'name' ) { continue ; } ; property.name = i ; } ;
-        if ( !result.os.name ) { result.os.name = 'otherOS' ; result.os.otherOS = true ; } ;
+        if ( !response.os.name ) { response.os.name = 'otherOS' ; response.os.otherOS = true ; } ;
       } ;
       
+      /* validate */ validate && validate.test( '2.3', 1, 0, 'platform' ) ;
       PLATFORM : {
-        if ( plugin_data[ 1 ] && ( !settings.options || !settings.options.platform ) ) { break PLATFORM ; } ;
+        if ( response.platform && ( !settings.options || !settings.options.platform ) ) { break PLATFORM ; } ;
         
-        result.platform = {
+        response.platform = {
+          name         : '' ,
           windows      : -1 < userAgent.indexOf( 'windows' ) ,
           mac          : -1 < userAgent.indexOf( 'macintosh' ) ,
           android      : -1 < userAgent.indexOf( 'android' ) ,
@@ -152,35 +174,39 @@
           otherPlatform : false
         } ;
         
-        property = result.platform ;
+        property = response.platform ;
         for ( var i in property ) { if ( !property[ i ] || i === 'name' ) { continue ; } ; property.name = i ; } ;
-        if ( !result.platform.name ) { result.platform.name = 'otherPlatform' ; result.platform.otherPlatform = true ; } ;
+        if ( !response.platform.name ) { response.platform.name = 'otherPlatform' ; response.platform.otherPlatform = true ; } ;
       } ;
       
+      /* validate */ validate && validate.test( '2.4', 1, 0, 'hardware' ) ;
       HARDWARE : {
-        if ( plugin_data[ 1 ] && ( !settings.options || !settings.options.hardware ) ) { break HARDWARE ; } ;
+        if ( response.hardware && ( !settings.options || !settings.options.hardware ) ) { break HARDWARE ; } ;
         
-        result.hardware = {
-          pc     : result.platform.windows || result.platform.mac ,
+        response.hardware = {
+          name   : '' ,
+          pc     : response.platform.windows || response.platform.mac ,
           mobile : -1 < userAgent.indexOf( 'mobile' ) ,
           tablet : -1 < userAgent.indexOf( 'tablet' ) ,
-          game   : result.platform.wii || result.platform.ds || result.platform.psp || result.platform.ps2 || result.platform.ps3 ,
+          game   : response.platform.wii || response.platform.ds || response.platform.psp || response.platform.ps2 || response.platform.ps3 ,
           otherHardware : false
         } ;
         
-        property = result.hardware ;
+        property = response.hardware ;
         for ( var i in property ) { if ( !property[ i ] || i === 'name' ) { continue ; } ; property.name = i ; } ;
-        if ( !result.hardware.name ) { result.hardware.name = 'otherHardware' ; result.hardware.otherHardware = true ; } ;
+        if ( !response.hardware.name ) { response.hardware.name = 'otherHardware' ; response.hardware.otherHardware = true ; } ;
       } ;
       
+      /* validate */ validate && validate.test( '2.5', 1, 0, 'browser' ) ;
       BROWSER : {
-        if ( plugin_data[ 1 ] && ( !settings.options || !settings.options.browser ) ) { break BROWSER ; } ;
+        if ( response.browser && ( !settings.options || !settings.options.browser ) ) { break BROWSER ; } ;
         
-        result.browser = {
+        response.browser = {
+          name      : '' ,
           version   : ( userAgent.match( /.*(?:rv|webkit|chrome|safari|opera(?:\/.+ version)?|msie)[\/: ]([\d.]+)/ ) || [] )[ 1 ] ,
           chrome    : -1 < userAgent.indexOf( 'chrome' ) ,
           safari    : -1 < userAgent.indexOf( 'safari' ) && 0 > userAgent.indexOf( 'chrome' ) ,
-          opera     : -1 < userAgent.indexOf( 'opera' ) && !result.platform.wii && !result.platform.ds ,
+          opera     : -1 < userAgent.indexOf( 'opera' ) && !response.platform.wii && !response.platform.ds ,
           firefox   : -1 < userAgent.indexOf( 'firefox' ) ,
           mozilla   : -1 < userAgent.indexOf( 'mozilla' ) && 0 > userAgent.indexOf( 'compatible' ) && 0 > userAgent.indexOf( 'webkit' ) && 0 > userAgent.indexOf( 'firefox' ) ,
           lunascape : -1 < userAgent.indexOf( 'lunascape' ) ,
@@ -189,33 +215,39 @@
           otherBrowser : false
         } ;
         
-        for ( var i = 5 , element ; i <= 10 ; i++ ) { result.browser[ 'ie' + i ] = Boolean( 0 === result.browser.version.indexOf( i + '.' ) && 0 > userAgent.indexOf( 'opera' ) ) ; } ;
+        for ( var i = 5 , element ; i <= 10 ; i++ ) { response.browser[ 'ie' + i ] = Boolean( 0 === response.browser.version.indexOf( i + '.' ) && 0 > userAgent.indexOf( 'opera' ) ) ; } ;
         
-        if ( result.browser.ie && settings.strict.ie ) {
-          result.browser[ 'ie' ] = Boolean( jQuery( '<!--[if IE ]><wbr><![endif]-->' ).length && jQuery( '<!--[if IE ]><wbr><![endif]-->' )[ 0 ].nodeType === 1 ) ;
+        if ( response.browser.ie && settings.strict.ie ) {
+          response.browser[ 'ie' ] = Boolean( jQuery( '<!--[if IE ]><wbr><![endif]-->' ).length && jQuery( '<!--[if IE ]><wbr><![endif]-->' )[ 0 ].nodeType === 1 ) ;
           for ( var i = 5 , element ; i <= 9 ; i++ ) {
             element = jQuery( '<!--[if IE ' + i + ']><wbr><![endif]-->' ) ;
-            result.browser[ 'ie' + i ] = Boolean( element.length && element[ 0 ].nodeType === 1 ) ;
+            response.browser[ 'ie' + i ] = Boolean( element.length && element[ 0 ].nodeType === 1 ) ;
             element = null ;
           } ;
         } ;
         
-        property = result.browser ;
+        property = response.browser ;
         for ( var i in property ) { if ( !property[ i ] || i === 'name' ) { continue ; } ; property.name = i ; } ;
-        if ( !result.browser.name ) { result.browser.name = 'otherBrowser' ; result.browser.otherBrowser = true ; } ;
+        if ( !response.browser.name ) { response.browser.name = 'otherBrowser' ; response.browser.otherBrowser = true ; } ;
       } ;
       
+      /* validate */ validate && validate.test( '2.6', 1, 0, 'attribute' ) ;
       ATTRIBUTE : {
-        if ( plugin_data[ 1 ] && ( !settings.options || !settings.options.attribute ) ) { break ATTRIBUTE ; } ;
+        if ( response.attribute && ( !settings.options || !settings.options.attribute ) ) { break ATTRIBUTE ; } ;
         
-        result.attribute = {
+        response.attribute = {
           name : '' ,
-          touch : -1 < userAgent.indexOf( 'touch' ) || result.hardware.tablet || result.platform.iphone || result.platform.ipad || result.platform.android
+          touch : -1 < userAgent.indexOf( 'touch' ) ||
+                       response.hardware.tablet ||
+                       response.platform.iphone ||
+                       response.platform.ipad ||
+                       ( response.platform.android && response.hardware.mobile )
         } ;
       } ;
       
+      /* validate */ validate && validate.test( '2.7', 1, 0, 'font' ) ;
       FONT : {
-        if ( plugin_data[ 1 ] && plugin_data[ 1 ].response.font && ( !settings.options || !settings.options.font ) ) { break FONT ; } ;
+        if ( response.font && ( !settings.options || !settings.options.font ) ) { break FONT ; } ;
         
         if ( !settings.font || !jQuery( 'body' ).length ) { break FONT ; } ;
         
@@ -271,7 +303,7 @@
         
         style = fonts.join( ', ' ) + ' !important; ' + style ;
         fonts = settings.font.family.split( /\s*,\s*/ )
-        result.font = { support : '' , support4style : '' , notsupport : '' , notsupport4style : '' } ;
+        response.font = { support : '' , support4style : '' , notsupport : '' , notsupport4style : '' } ;
         
         element = jQuery( '<pre/>' ).text( text ) ;
         body.append( element ) ;
@@ -280,14 +312,14 @@
           for ( var j = 0 , len = base.length , source , format ; source = base[ j ] ; j++ ) {
             element.attr( 'style' , 'font-family: ' + font4style + ', ' + style.slice( !j ? 0 : style.indexOf( ', ' ) + 2 ) ) ;
             if ( source[ 0 ].offsetWidth !== element[ 0 ].offsetWidth || source[ 0 ].offsetHeight !== element[ 0 ].offsetHeight ) {
-              result.font[ font ] = true ;
-              result.font.support += ',' + font ;
-              result.font.support4style += ',' + font4style ;
+              response.font[ font ] = true ;
+              response.font.support += ',' + font ;
+              response.font.support4style += ',' + font4style ;
               break ;
             } else if ( j === len - 1 ) {
-              result.font[ font ] = false ;
-              result.font.notsupport += ',' + font ;
-              result.font.notsupport4style += ',' + font4style ;
+              response.font[ font ] = false ;
+              response.font.notsupport += ',' + font ;
+              response.font.notsupport4style += ',' + font4style ;
             } ;
           } ;
         } ;
@@ -299,109 +331,171 @@
         element.remove() ;
         element = null ;
         
-        result.font.support = result.font.support.slice( 1 ) ;
-        result.font.notsupport = result.font.notsupport.slice( 1 ) ;
-        result.font.support4style = result.font.support4style.slice( 1 ) ;
-        result.font.notsupport4style = result.font.notsupport4style.slice( 1 ) ;
-        result.font.name = result.font.support.split( /\s*,\s*/ , 2 )[ 0 ] ;
+        response.font.support = response.font.support.slice( 1 ) ;
+        response.font.notsupport = response.font.notsupport.slice( 1 ) ;
+        response.font.support4style = response.font.support4style.slice( 1 ) ;
+        response.font.notsupport4style = response.font.notsupport4style.slice( 1 ) ;
+        response.font.name = response.font.support.split( /\s*,\s*/ , 2 )[ 0 ] ;
       } ;
       
+      /* validate */ validate && validate.test( '2.8', 1, 0, 'support' ) ;
       SUPPORT : {
-        if ( !settings.support ) { break SUPPORT ; } ;
+        if ( !response.support ) { break SUPPORT ; } ;
         
-        result.support = jQuery.support ;
+        response.support = jQuery.support ;
       } ;
-      
-      jQuery.extend( true , settings.response , result ) ;
-      plugin_data[ 1 ] = settings ;
     }
     
     function addClass( property , query , key ) {
-      var settings = plugin_data[ 1 ] , fproperty , fquery , classname ;
+      /* validate */ var validate = plugin_data[ 1 ].validate ? plugin_data[ 1 ].validate.clone( { name : 'jquery.clientenv.js' } ) : false ;
+      /* validate */ validate && validate.start() ;
+      /* validate */ validate && validate.test( 1, 1, arguments, 'addClass()' ) ;
+      var fproperty , fquery , classname ;
       
-      if ( !settings.response[ 0 ] || !property ) { return this ; } ;
+      if ( !this[ 0 ] || !property ) {
+        /* validate */ validate && validate.end() ;
+        return this ;
+      } ;
       
+      /* validate */ validate && validate.test( 2, 1, 0, 'for' ) ;
+      /* validate */ validate && validate.test( '*', 1, 0, 'for enter' ) ;
       for ( var i = 0 , properties = property.split( /\s+/ ) ; property = properties[ i ] ; i++ ) {
-        result = format( property , query ) ;
+        /* validate */ validate && validate.test( '*', 1, property, 'for start' ) ;
+        
+        result = format.apply( this , [ property , query ] ) ;
+        /* validate */ validate && validate.test( '++', 1, result, 'fomat' ) ;
         fproperty = result[ 0 ] ;
         fquery = result[ 1 ] ;
         
-        classname = key || fquery || reference( fproperty , fquery ) ;
+        classname = key || fquery || reference.apply( this , [ fproperty , fquery ] ) ;
         
-        if ( is( fproperty , fquery , true ) ) {
-          !settings.not && !classname.indexOf( 'not-' ) ? null : jQuery( plugin_data[ 1 ].response[ 0 ] ).addClass( classname ) ;
+        /* validate */ validate && validate.test( '++', 1, [ fproperty, fquery ], 'is( fproperty, fquery, true )' ) ;
+        if ( this.is( fproperty , fquery , true ) ) {
+          /* validate */ validate && validate.test( '++', 1, classname, 'true' ) ;
+          !this.not && !classname.indexOf( 'not-' ) ? null : jQuery( this[ 0 ] ).addClass( classname ) ;
         } else {
-          if ( fquery === undefined ) { return this ; } ;
-          !settings.not ? null : jQuery( plugin_data[ 1 ].response[ 0 ] ).addClass( ( classname.indexOf( 'not-' ) ? 'not-' : '' ) + classname ) ;
+          /* validate */ validate && validate.test( '++', 1, classname, 'false' ) ;
+          if ( fquery === undefined ) {
+            
+            /* validate */ validate && validate.test( '/', 1, 0, 'for end' ) ;
+            continue ;
+          } ;
+          !this.not ? null : jQuery( this[ 0 ] ).addClass( ( classname.indexOf( 'not-' ) ? 'not-' : '' ) + classname ) ;
         } ;
+        
+        /* validate */ validate && validate.test( '/', 1, 0, 'for end' ) ;
       } ;
+      /* validate */ validate && validate.test( '/', 1, 0, 'for exit' ) ;
       
+      /* validate */ validate && validate.end() ;
+      /* validate */ validate && validate.remove() ;
       return this ;
     }
     
     function removeClass( property , query , key ) {
-      var settings = plugin_data[ 1 ] , fproperty , fquery , classname ;
+      /* validate */ var validate = plugin_data[ 1 ].validate ? plugin_data[ 1 ].validate.clone( { name : 'jquery.clientenv.js' } ) : false ;
+      /* validate */ validate && validate.start() ;
+      /* validate */ validate && validate.test( 1, 1, arguments, 'removeClass()' ) ;
+      var fproperty , fquery , classname ;
       
-      if ( !settings.response[ 0 ] || !property ) { return this ; } ;
+      if ( !this[ 0 ] || !property ) {
+        /* validate */ validate && validate.end() ;
+        return this ;
+      } ;
       
+      /* validate */ validate && validate.test( 2, 1, 0, 'for' ) ;
+      /* validate */ validate && validate.test( '*', 1, 0, 'for enter' ) ;
       for ( var i = 0 , properties = property.split( /\s+/ ) ; property = properties[ i ] ; i++ ) {
-        result = format( property , query ) ;
+        /* validate */ validate && validate.test( '*', 1, property, 'for start' ) ;
+        
+        result = format.apply( this , [ property , query ] ) ;
+        /* validate */ validate && validate.test( '++', 1, result, 'fomat' ) ;
         fproperty = result[ 0 ] ;
         fquery = result[ 1 ] ;
         
-        classname = key || fquery || reference( fproperty , fquery ) ;
+        classname = key || fquery || reference.apply( this , [ fproperty , fquery ] ) ;
         
-        if ( is( fproperty , fquery , true ) ) {
-          !settings.not && !classname.indexOf( 'not-' ) ? null : jQuery( plugin_data[ 1 ].response[ 0 ] ).removeClass( classname ) ;
+        /* validate */ validate && validate.test( '++', 1, [ fproperty, fquery ], 'is( fproperty, fquery, true )' ) ;
+        if ( this.is( fproperty , fquery , true ) ) {
+          /* validate */ validate && validate.test( '++', 1, classname, 'true' ) ;
+          !this.not && !classname.indexOf( 'not-' ) ? null : jQuery( this[ 0 ] ).removeClass( classname ) ;
         } else {
-          if ( fquery === undefined ) { return this ; } ;
-          !settings.not ? null : jQuery( plugin_data[ 1 ].response[ 0 ] ).removeClass( ( classname.indexOf( 'not-' ) ? 'not-' : '' ) + classname ) ;
+          /* validate */ validate && validate.test( '++', 1, classname, 'false' ) ;
+          if ( fquery === undefined ) {
+            
+            /* validate */ validate && validate.test( '/', 1, 0, 'for end' ) ;
+            continue ;
+          } ;
+          !this.not ? null : jQuery( this[ 0 ] ).removeClass( ( classname.indexOf( 'not-' ) ? 'not-' : '' ) + classname ) ;
         } ;
+        
+        /* validate */ validate && validate.test( '/', 1, 0, 'for end' ) ;
       } ;
+      /* validate */ validate && validate.test( '/', 1, 0, 'for exit' ) ;
       
+      /* validate */ validate && validate.end() ;
+      /* validate */ validate && validate.remove() ;
       return this ;
     }
     
     function is( property , query , boolean ) {
-      var settings = plugin_data[ 1 ] , properties , queries , result = 0 ;
+      /* validate */ var validate = plugin_data[ 1 ].validate ? plugin_data[ 1 ].validate.clone( { name : 'jquery.clientenv.js' } ) : false ;
+      /* validate */ validate && validate.start() ;
+      /* validate */ validate && validate.test( 1, 1, arguments, 'is()' ) ;
+      var properties , queries , result = 0 ;
       
       properties = property.replace( /"|'/g , '' ).split( /\s*,\s*/ ) ;
       queries = query === undefined || query === 'name' ? [ 'name' ] : query.replace( /"|'/g , '' ).split( /\s*,\s*/ ) ;
+      /* validate */ validate && validate.test( '*', 1, 0 , 'for enter' ) ;
       for ( var i = 0 , property ; property = properties[ i ] ; i++ ) {
+        if ( !this[ 0 ] ) { break ; } ;
         for ( var j = 0 , query ; query = queries[ j ] ; j++ ) {
-          query = format( property , query ) ;
+          /* validate */ validate && validate.test( '*', 1, [ property , query ] , 'for start' ) ;
+          query = format.apply( this , [ property , query ] ) ;
+          /* validate */ validate && validate.test( '++', 1, query , 'format' ) ;
           property = query[ 0 ] ;
           query = query[ 1 ] ;
           
-          result += reference( property , query ) ? 1 : 0 ;
+          /* validate */ validate && validate.test( '++', 1, result , 'reference' ) ;
+          result += reference.apply( this , [ property , query ] ) ? 1 : 0 ;
+          /* validate */ validate && validate.test( '/', 1, result , 'for end' ) ;
         } ;
       } ;
+      /* validate */ validate && validate.test( '/', 1, 0 , 'for exit' ) ;
       result = query !== undefined && 0 === query.indexOf( 'not-' ) ? !result : result ;
-      if ( !result && !boolean ) { delete plugin_data[ 1 ].response[ 0 ] ; } ;
-      return boolean ? Boolean( result ) : plugin_data[ 1 ].response ;
+      if ( !result && !boolean ) { delete this[ 0 ] ; } ;
+      /* validate */ validate && validate.end() ;
+      /* validate */ validate && validate.remove() ;
+      return boolean ? Boolean( result ) : this ;
     }
     
     function format( property , query ) {
-      if ( property in settings.response && query ) {
+      /* validate */ var validate = plugin_data[ 1 ].validate ? plugin_data[ 1 ].validate.clone( { name : 'jquery.clientenv.js' } ) : false ;
+      /* validate */ validate && validate.start() ;
+      /* validate */ validate && validate.test( 1, 1, arguments, 'format()' ) ;
+      if ( property in this && query ) {
         query = query ? query.replace( /(\S+):(\S+)/ , '$2-$1' ) : query ;
         query = query ? query.replace( /(\w+)-(not-)/ , '$2-$1' ) : query ;
-      } else if ( property in settings.response ) {
+      } else if ( property in this ) {
       } else {
         property = property ? property.replace( /(\S+):(\S+)/ , '$2-$1' ) : property ;
         property = property ? property.replace( /(\w+)-(not-)/ , '$2-$1' ) : property ;
         query = [ property.split( /(?:not|lte|lt|gte|gt)-/ ).pop() ][ 0 ] ;
-        for ( var i in settings.response ) {
-          if ( query in settings.response[ i ] ) {
+        for ( var i in this ) {
+          if ( typeof this[ i ] !== 'object' ) { continue ; } ;
+          if ( query in this[ i ] ) {
             query = property ;
             property = i ;
           } ;
         } ;
       } ;
+      /* validate */ validate && validate.end() ;
+      /* validate */ validate && validate.remove() ;
       return [ property , query ] ;
     }
     
     function reference( property , query ) {
-      var settings = plugin_data[ 1 ] , queries , list , position = [ undefined , undefined ] , result ;
+      var queries , list , position = [ undefined , undefined ] , result ;
       
       queries = query === undefined ? [ query ] : query.replace( /(not|)-?(lte|lt|gte|gt|)-?(\S+)/ , '$3,$2,$1' ).split( ',' ) ;
       queries[ 2 ] = queries[ 2 ] === 'not' ? false : true ;
@@ -409,8 +503,8 @@
       switch ( true ) {
         case !query || 0 > query.indexOf( '-' ) :
           query = query ? query : 'name' ;
-          if ( settings.response[ property ] && query in settings.response[ property ] ) {
-            result = settings.response[ property ][ query ] ;
+          if ( this[ property ] && query in this[ property ] ) {
+            result = this[ property ][ query ] ;
           } else {
             result = undefined
           } ;
@@ -463,7 +557,7 @@
       } ;
       
       for ( var i = 0 , value ; value = list[ i ] ; i++ ) {
-        if ( settings.response[ property ][ 'name' ] === value ) { position[ 0 ] = i ; } ;
+        if ( this[ property ][ 'name' ] === value ) { position[ 0 ] = i ; } ;
         if ( queries[ 0 ] === value ) { position[ 1 ] = i ; } ;
       } ;
       
@@ -492,10 +586,30 @@
       return queries[ 2 ] ? result : !result ;
     }
     
+    function data() {
+      /* validate */ var validate = plugin_data[ 1 ].validate ? plugin_data[ 1 ].validate.clone( { name : 'jquery.clientenv.js' } ) : false ;
+      /* validate */ validate && validate.start() ;
+      /* validate */ validate && validate.test( 1, 1, this, 'data()' ) ;
+      var response = {} ;
+      
+      for ( var i in this ) {
+        if ( i in this ) { typeof this[ i ] === 'object' && !isFinite( this[ i ].nodeType ) && ( response[ i ] = this[ i ] ) ; } ;
+      } ;
+      /* validate */ validate && validate.test( 2, 1, response, 'response' ) ;
+      /* validate */ validate && validate.end() ;
+      /* validate */ validate && validate.remove() ;
+      return response ;
+    }
+    
     function reset( options ) {
+      /* validate */ var validate = plugin_data[ 1 ].validate ? plugin_data[ 1 ].validate.clone( { name : 'jquery.clientenv.js' } ) : false ;
+      /* validate */ validate && validate.start() ;
+      /* validate */ validate && validate.test( 1, 1, arguments, 'reset()' ) ;
       1 < plugin_data.length && plugin_data.splice( 1 , 1 ) ;
       clientenv( options ) ;
-      return 1 < plugin_data.length ? plugin_data[ 1 ].response : undefined ;
+      /* validate */ validate && validate.end() ;
+      /* validate */ validate && validate.remove() ;
+      return 1 < plugin_data.length ? this : undefined ;
     }
   }
 } )() ;
