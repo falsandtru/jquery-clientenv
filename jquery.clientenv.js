@@ -5,7 +5,7 @@
  * ---
  * @Copyright(c) 2013, falsandtru
  * @license MIT  http://opensource.org/licenses/mit-license.php  http://sourceforge.jp/projects/opensource/wiki/licenses%2FMIT_license
- * @version 0.0.8
+ * @version 0.0.9
  * @updated 2013/04/27
  * @author falsandtru  http://fat.main.jp/  http://sa-kusaku.sakura.ne.jp/
  * @CodingConventions Google JavaScript Style Guide
@@ -202,7 +202,7 @@
         
         response.browser = {
           name      : '' ,
-          version   : ( userAgent.match( /.*(?:rv|webkit|chrome|safari|opera(?:\/.+ version)?|msie)[\/: ]([\d.]+)/ ) || [] )[ 1 ] ,
+          version   : ( userAgent.match( /(?:chrome|firefox|safari|msie|opera(?:\/.+ version)?|version)[\/:\s]([\d.]+)/ ) || [] )[ 1 ] ,
           chrome    : -1 < userAgent.indexOf( 'chrome' ) ,
           safari    : -1 < userAgent.indexOf( 'safari' ) && 0 > userAgent.indexOf( 'chrome' ) ,
           opera     : -1 < userAgent.indexOf( 'opera' ) && !response.platform.wii && !response.platform.ds ,
