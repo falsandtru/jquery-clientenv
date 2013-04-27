@@ -5,7 +5,7 @@
  * ---
  * @Copyright(c) 2013, falsandtru
  * @license MIT  http://opensource.org/licenses/mit-license.php  http://sourceforge.jp/projects/opensource/wiki/licenses%2FMIT_license
- * @version 0.0.9
+ * @version 0.1.0
  * @updated 2013/04/27
  * @author falsandtru  http://fat.main.jp/  http://sa-kusaku.sakura.ne.jp/
  * @CodingConventions Google JavaScript Style Guide
@@ -82,6 +82,7 @@
             clientenv : clientenv ,
             addClass : addClass ,
             removeClass : removeClass ,
+            filter : filter ,
             is : is ,
             data : data ,
             reset : reset ,
@@ -369,8 +370,8 @@
         
         classname = key || fquery || reference.apply( this , [ fproperty , fquery ] ) ;
         
-        /* validate */ validate && validate.test( '++', 1, [ fproperty, fquery ], 'is( fproperty, fquery, true )' ) ;
-        if ( this.is( fproperty , fquery , true ) ) {
+        /* validate */ validate && validate.test( '++', 1, [ fproperty, fquery ], 'is( fproperty, fquery )' ) ;
+        if ( this.is( fproperty , fquery ) ) {
           /* validate */ validate && validate.test( '++', 1, classname, 'true' ) ;
           !this.not && !classname.indexOf( 'not-' ) ? null : jQuery( this[ 0 ] ).addClass( classname ) ;
         } else {
@@ -414,8 +415,8 @@
         
         classname = key || fquery || reference.apply( this , [ fproperty , fquery ] ) ;
         
-        /* validate */ validate && validate.test( '++', 1, [ fproperty, fquery ], 'is( fproperty, fquery, true )' ) ;
-        if ( this.is( fproperty , fquery , true ) ) {
+        /* validate */ validate && validate.test( '++', 1, [ fproperty, fquery ], 'is( fproperty, fquery )' ) ;
+        if ( this.is( fproperty , fquery ) ) {
           /* validate */ validate && validate.test( '++', 1, classname, 'true' ) ;
           !this.not && !classname.indexOf( 'not-' ) ? null : jQuery( this[ 0 ] ).removeClass( classname ) ;
         } else {
@@ -436,10 +437,19 @@
       return this ;
     }
     
-    function is( property , query , boolean ) {
+    function filter( property , query ) {
       /* validate */ var validate = plugin_data[ 1 ].validate ? plugin_data[ 1 ].validate.clone( { name : 'jquery.clientenv.js' } ) : false ;
       /* validate */ validate && validate.start() ;
-      /* validate */ validate && validate.test( 1, 1, arguments, 'is()' ) ;
+      /* validate */ validate && validate.test( 1, 1, arguments, 'filter()' ) ;
+      if ( !this.is( property , query ) ) { delete this[ 0 ] ; } ;
+      /* validate */ validate && validate.end() ;
+      return this ;
+    }
+    
+    function is( property , query ) {
+      /* validate */ var validate = plugin_data[ 1 ].validate ? plugin_data[ 1 ].validate.clone( { name : 'jquery.clientenv.js' } ) : false ;
+      /* validate */ validate && validate.start() ;
+      /* validate */ validate && validate.test( 1, 1, arguments, 'filter()' ) ;
       var properties , queries , result = 0 ;
       
       properties = property.replace( /"|'/g , '' ).split( /\s*,\s*/ ) ;
@@ -461,9 +471,8 @@
       } ;
       /* validate */ validate && validate.test( '/', 1, 0 , 'for out' ) ;
       result = query !== undefined && 0 === query.indexOf( 'not-' ) ? !result : result ;
-      if ( !result && !boolean ) { delete this[ 0 ] ; } ;
       /* validate */ validate && validate.end() ;
-      return boolean ? Boolean( result ) : this ;
+      return Boolean( result ) ;
     }
     
     function format( property , query ) {
