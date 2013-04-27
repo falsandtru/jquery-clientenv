@@ -5,8 +5,8 @@
  * ---
  * @Copyright(c) 2013, falsandtru
  * @license MIT  http://opensource.org/licenses/mit-license.php  http://sourceforge.jp/projects/opensource/wiki/licenses%2FMIT_license
- * @version 0.1.0
- * @updated 2013/04/27
+ * @version 0.1.1
+ * @updated 2013/04/28
  * @author falsandtru  http://fat.main.jp/  http://sa-kusaku.sakura.ne.jp/
  * @CodingConventions Google JavaScript Style Guide
  * ---
@@ -594,7 +594,7 @@
     function data() {
       /* validate */ var validate = plugin_data[ 1 ].validate ? plugin_data[ 1 ].validate.clone( { name : 'jquery.clientenv.js' } ) : false ;
       /* validate */ validate && validate.start() ;
-      /* validate */ validate && validate.test( 1, 1, this, 'data()' ) ;
+      /* validate */ validate && validate.test( 1, 1, arguments, 'data()' ) ;
       var response = { userAgent : this.userAgent } ;
       
       for ( var i in this ) {
