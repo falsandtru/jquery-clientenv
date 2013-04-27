@@ -5,8 +5,8 @@
  * ---
  * @Copyright(c) 2013, falsandtru
  * @license MIT  http://opensource.org/licenses/mit-license.php  http://sourceforge.jp/projects/opensource/wiki/licenses%2FMIT_license
- * @version 0.0.7
- * @updated 2013/04/24
+ * @version 0.0.8
+ * @updated 2013/04/27
  * @author falsandtru  http://fat.main.jp/  http://sa-kusaku.sakura.ne.jp/
  * @CodingConventions Google JavaScript Style Guide
  * ---
@@ -23,11 +23,11 @@
  * 
  */
 
-( function() {
+( function () {
   
-  if ( typeof window[ 'jQuery' ] === 'undefined' ) { return ; } ;
+  if ( typeof window.jQuery === 'undefined' ) { return ; } ;
   
-  var $ = jQuery = window[ 'jQuery' ] , undefined = void( 0 ) , win = window , doc = document , plugin_data = [ 'settings' ] ;
+  var $ = jQuery = window.jQuery , undefined = void( 0 ) , win = window , doc = document , plugin_data = [ 'settings' ] ;
   
   jQuery.fn.clientenv = clientenv ;
   jQuery.clientenv = clientenv ;
@@ -37,8 +37,8 @@
     
     if ( typeof this === 'function' || this === win ) { return arguments.callee.apply( jQuery( 'html' ) , arguments ) ; } ;
     
-    /* validate */ var validate = typeof window.validate === 'object' ? window.validate : false ;
-    /* validate */ var validate = validate ? validate.clone( { name : 'jquery.clientenv.js' } ) : validate ;
+    /* validate */ var validate = typeof window.validator === 'object' ? window.validator : false ;
+    /* validate */ var validate = validate ? validate.clone( { name : 'jquery.clientenv.js' , base : true } ) : validate ;
     /* validate */ validate && validate.start() ;
     /* validate */ validate && validate.test( 1, 1, 0, 'plugin load' ) ;
     
@@ -85,7 +85,7 @@
             is : is ,
             data : data ,
             reset : reset ,
-            end : function() { return context ; }
+            end : function () { return context ; }
           } ,
           validate : validate
         }
@@ -99,7 +99,6 @@
     } ;
     
     /* validate */ validate && validate.end() ;
-    /* validate */ validate && validate.remove() ;
     
     return 1 < plugin_data.length ? plugin_data[ 1 ].response : undefined ;
     
@@ -241,7 +240,8 @@
                        response.hardware.tablet ||
                        response.platform.iphone ||
                        response.platform.ipad ||
-                       ( response.platform.android && response.hardware.mobile )
+                       ( response.platform.android && response.hardware.mobile ) ,
+          bot : /Bot\W|Robot|Crawler|Spider/i.test( userAgent )
         } ;
       } ;
       
@@ -358,7 +358,7 @@
       } ;
       
       /* validate */ validate && validate.test( 2, 1, 0, 'for' ) ;
-      /* validate */ validate && validate.test( '*', 1, 0, 'for enter' ) ;
+      /* validate */ validate && validate.test( '*', 1, 0, 'for in' ) ;
       for ( var i = 0 , properties = property.split( /\s+/ ) ; property = properties[ i ] ; i++ ) {
         /* validate */ validate && validate.test( '*', 1, property, 'for start' ) ;
         
@@ -385,10 +385,9 @@
         
         /* validate */ validate && validate.test( '/', 1, 0, 'for end' ) ;
       } ;
-      /* validate */ validate && validate.test( '/', 1, 0, 'for exit' ) ;
+      /* validate */ validate && validate.test( '/', 1, 0, 'for out' ) ;
       
       /* validate */ validate && validate.end() ;
-      /* validate */ validate && validate.remove() ;
       return this ;
     }
     
@@ -404,7 +403,7 @@
       } ;
       
       /* validate */ validate && validate.test( 2, 1, 0, 'for' ) ;
-      /* validate */ validate && validate.test( '*', 1, 0, 'for enter' ) ;
+      /* validate */ validate && validate.test( '*', 1, 0, 'for in' ) ;
       for ( var i = 0 , properties = property.split( /\s+/ ) ; property = properties[ i ] ; i++ ) {
         /* validate */ validate && validate.test( '*', 1, property, 'for start' ) ;
         
@@ -431,10 +430,9 @@
         
         /* validate */ validate && validate.test( '/', 1, 0, 'for end' ) ;
       } ;
-      /* validate */ validate && validate.test( '/', 1, 0, 'for exit' ) ;
+      /* validate */ validate && validate.test( '/', 1, 0, 'for out' ) ;
       
       /* validate */ validate && validate.end() ;
-      /* validate */ validate && validate.remove() ;
       return this ;
     }
     
@@ -446,7 +444,7 @@
       
       properties = property.replace( /"|'/g , '' ).split( /\s*,\s*/ ) ;
       queries = query === undefined || query === 'name' ? [ 'name' ] : query.replace( /"|'/g , '' ).split( /\s*,\s*/ ) ;
-      /* validate */ validate && validate.test( '*', 1, 0 , 'for enter' ) ;
+      /* validate */ validate && validate.test( '*', 1, 0 , 'for in' ) ;
       for ( var i = 0 , property ; property = properties[ i ] ; i++ ) {
         if ( !this[ 0 ] ) { break ; } ;
         for ( var j = 0 , query ; query = queries[ j ] ; j++ ) {
@@ -461,11 +459,10 @@
           /* validate */ validate && validate.test( '/', 1, result , 'for end' ) ;
         } ;
       } ;
-      /* validate */ validate && validate.test( '/', 1, 0 , 'for exit' ) ;
+      /* validate */ validate && validate.test( '/', 1, 0 , 'for out' ) ;
       result = query !== undefined && 0 === query.indexOf( 'not-' ) ? !result : result ;
       if ( !result && !boolean ) { delete this[ 0 ] ; } ;
       /* validate */ validate && validate.end() ;
-      /* validate */ validate && validate.remove() ;
       return boolean ? Boolean( result ) : this ;
     }
     
@@ -490,7 +487,6 @@
         } ;
       } ;
       /* validate */ validate && validate.end() ;
-      /* validate */ validate && validate.remove() ;
       return [ property , query ] ;
     }
     
@@ -590,14 +586,13 @@
       /* validate */ var validate = plugin_data[ 1 ].validate ? plugin_data[ 1 ].validate.clone( { name : 'jquery.clientenv.js' } ) : false ;
       /* validate */ validate && validate.start() ;
       /* validate */ validate && validate.test( 1, 1, this, 'data()' ) ;
-      var response = {} ;
+      var response = { userAgent : this.userAgent } ;
       
       for ( var i in this ) {
         if ( i in this ) { typeof this[ i ] === 'object' && !isFinite( this[ i ].nodeType ) && ( response[ i ] = this[ i ] ) ; } ;
       } ;
       /* validate */ validate && validate.test( 2, 1, response, 'response' ) ;
       /* validate */ validate && validate.end() ;
-      /* validate */ validate && validate.remove() ;
       return response ;
     }
     
@@ -608,7 +603,6 @@
       1 < plugin_data.length && plugin_data.splice( 1 , 1 ) ;
       clientenv( options ) ;
       /* validate */ validate && validate.end() ;
-      /* validate */ validate && validate.remove() ;
       return 1 < plugin_data.length ? this : undefined ;
     }
   }
