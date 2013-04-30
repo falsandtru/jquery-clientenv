@@ -5,8 +5,8 @@
  * ---
  * @Copyright(c) 2013, falsandtru
  * @license MIT  http://opensource.org/licenses/mit-license.php  http://sourceforge.jp/projects/opensource/wiki/licenses%2FMIT_license
- * @version 0.1.1
- * @updated 2013/04/28
+ * @version 0.1.2
+ * @updated 2013/04/30
  * @author falsandtru  http://fat.main.jp/  http://sa-kusaku.sakura.ne.jp/
  * @CodingConventions Google JavaScript Style Guide
  * ---
@@ -75,20 +75,27 @@
             array : nsArray
           } ,
           context : this ,
-          response : {
-            0 : this[ 0 ] ,
-            not : settings.not ,
-            userAgent : settings.userAgent ,
-            clientenv : clientenv ,
-            addClass : addClass ,
-            removeClass : removeClass ,
-            filter : filter ,
-            is : is ,
-            data : data ,
-            reset : reset ,
-            end : function () { return context ; }
-          } ,
+          response : {} ,
           validate : validate
+        }
+      ) ;
+      
+      jQuery.extend
+      (
+        true ,
+        settings.response , 
+        plugin_data[ 1 ] ? plugin_data[ 1 ].response : {} ,{
+          0 : this[ 0 ] ,
+          not : settings.not ,
+          userAgent : settings.userAgent ,
+          clientenv : clientenv ,
+          addClass : addClass ,
+          removeClass : removeClass ,
+          filter : filter ,
+          is : is ,
+          data : data ,
+          reset : reset ,
+          end : function () { return context ; }
         }
       ) ;
       
@@ -113,12 +120,12 @@
       
       var
         userAgent = settings.userAgent.toLowerCase() ,
-        response = settings.response ,
+        response = {} ,
         property ;
       
       /* validate */ validate && validate.test( '2.2', 1, 0, 'os' ) ;
       OS : {
-        if ( response.os && ( !settings.options || !settings.options.os ) ) { break OS ; } ;
+        if ( plugin_data[ 1 ] && plugin_data[ 1 ].response.os && ( !settings.options || !settings.options.os ) ) { break OS ; } ;
         
         response.os = {
           name              : '' ,
@@ -154,7 +161,7 @@
       
       /* validate */ validate && validate.test( '2.3', 1, 0, 'platform' ) ;
       PLATFORM : {
-        if ( response.platform && ( !settings.options || !settings.options.platform ) ) { break PLATFORM ; } ;
+        if ( plugin_data[ 1 ] && plugin_data[ 1 ].response.platform && ( !settings.options || !settings.options.platform ) ) { break PLATFORM ; } ;
         
         response.platform = {
           name         : '' ,
@@ -181,7 +188,7 @@
       
       /* validate */ validate && validate.test( '2.4', 1, 0, 'hardware' ) ;
       HARDWARE : {
-        if ( response.hardware && ( !settings.options || !settings.options.hardware ) ) { break HARDWARE ; } ;
+        if ( plugin_data[ 1 ] && plugin_data[ 1 ].response.hardware && ( !settings.options || !settings.options.hardware ) ) { break HARDWARE ; } ;
         
         response.hardware = {
           name   : '' ,
@@ -199,7 +206,7 @@
       
       /* validate */ validate && validate.test( '2.5', 1, 0, 'browser' ) ;
       BROWSER : {
-        if ( response.browser && ( !settings.options || !settings.options.browser ) ) { break BROWSER ; } ;
+        if ( plugin_data[ 1 ] && plugin_data[ 1 ].response.browser && ( !settings.options || !settings.options.browser ) ) { break BROWSER ; } ;
         
         response.browser = {
           name      : '' ,
@@ -215,7 +222,9 @@
           otherBrowser : false
         } ;
         
-        for ( var i = 5 , element ; i <= 10 ; i++ ) { response.browser[ 'ie' + i ] = Boolean( 0 === response.browser.version.indexOf( i + '.' ) && 0 > userAgent.indexOf( 'opera' ) ) ; } ;
+        for ( var i = 5 , element ; i <= 10 ; i++ ) {
+          response.browser[ 'ie' + i ] = Boolean( response.browser.ie && 0 === response.browser.version.indexOf( i ) && 0 > userAgent.indexOf( 'opera' ) ) ;
+        } ;
         
         if ( response.browser.ie && settings.strict.ie ) {
           response.browser[ 'ie' ] = Boolean( jQuery( '<!--[if IE ]><wbr><![endif]-->' ).length && jQuery( '<!--[if IE ]><wbr><![endif]-->' )[ 0 ].nodeType === 1 ) ;
@@ -233,7 +242,7 @@
       
       /* validate */ validate && validate.test( '2.6', 1, 0, 'attribute' ) ;
       ATTRIBUTE : {
-        if ( response.attribute && ( !settings.options || !settings.options.attribute ) ) { break ATTRIBUTE ; } ;
+        if ( plugin_data[ 1 ] && plugin_data[ 1 ].response.attribute && ( !settings.options || !settings.options.attribute ) ) { break ATTRIBUTE ; } ;
         
         response.attribute = {
           name : '' ,
@@ -248,7 +257,7 @@
       
       /* validate */ validate && validate.test( '2.7', 1, 0, 'font' ) ;
       FONT : {
-        if ( response.font && ( !settings.options || !settings.options.font ) ) { break FONT ; } ;
+        if ( plugin_data[ 1 ] && plugin_data[ 1 ].response.font && ( !settings.options || !settings.options.font ) ) { break FONT ; } ;
         
         if ( !settings.font || !jQuery( 'body' ).length ) { break FONT ; } ;
         
@@ -345,6 +354,7 @@
         
         response.support = jQuery.support ;
       } ;
+      jQuery.extend( true , settings.response , response ) ;
     }
     
     function addClass( property , query , key ) {
