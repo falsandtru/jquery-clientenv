@@ -5,8 +5,8 @@
  * ---
  * @Copyright(c) 2013, falsandtru
  * @license MIT  http://opensource.org/licenses/mit-license.php  http://sourceforge.jp/projects/opensource/wiki/licenses%2FMIT_license
- * @version 0.1.2
- * @updated 2013/04/30
+ * @version 0.1.3
+ * @updated 2013/05/03
  * @author falsandtru  http://fat.main.jp/  http://sa-kusaku.sakura.ne.jp/
  * @CodingConventions Google JavaScript Style Guide
  * ---
@@ -167,6 +167,7 @@
           name         : '' ,
           windows      : -1 < userAgent.indexOf( 'windows' ) ,
           mac          : -1 < userAgent.indexOf( 'macintosh' ) ,
+          linux        : -1 < userAgent.indexOf( 'x11' ) ,
           android      : -1 < userAgent.indexOf( 'android' ) ,
           iphone       : -1 < userAgent.indexOf( 'iphone' ) ,
           ipad         : -1 < userAgent.indexOf( 'ipad' ) ,
@@ -459,7 +460,7 @@
     function is( property , query ) {
       /* validate */ var validate = plugin_data[ 1 ].validate ? plugin_data[ 1 ].validate.clone( { name : 'jquery.clientenv.js' } ) : false ;
       /* validate */ validate && validate.start() ;
-      /* validate */ validate && validate.test( 1, 1, arguments, 'filter()' ) ;
+      /* validate */ validate && validate.test( 1, 1, arguments, 'is()' ) ;
       var properties , queries , result = 0 ;
       
       properties = property.replace( /"|'/g , '' ).split( /\s*,\s*/ ) ;
