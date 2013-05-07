@@ -5,8 +5,8 @@
  * ---
  * @Copyright(c) 2013, falsandtru
  * @license MIT  http://opensource.org/licenses/mit-license.php  http://sourceforge.jp/projects/opensource/wiki/licenses%2FMIT_license
- * @version 0.1.3
- * @updated 2013/05/03
+ * @version 0.1.4
+ * @updated 2013/05/07
  * @author falsandtru  http://fat.main.jp/  http://sa-kusaku.sakura.ne.jp/
  * @CodingConventions Google JavaScript Style Guide
  * ---
@@ -37,13 +37,12 @@
     
     if ( typeof this === 'function' || this === win ) { return arguments.callee.apply( jQuery( 'html' ) , arguments ) ; } ;
     
-    /* validate */ var validate = typeof window.validator === 'object' ? window.validator : false ;
+    /* validate */ var validate = window.validator instanceof Object ? window.validator : false ;
     /* validate */ var validate = validate ? validate.clone( { name : 'jquery.clientenv.js' , base : true } ) : validate ;
     /* validate */ validate && validate.start() ;
     /* validate */ validate && validate.test( 1, 1, 0, 'plugin load' ) ;
     
     var
-      context = this ,
       defaults = {
         id : 0 ,
         gns : 'clientenv' ,
@@ -74,37 +73,32 @@
             class4html : nsArray.join( '-' ) ,
             array : nsArray
           } ,
-          context : this ,
-          response : {} ,
+          response : {
+            0 : this[ 0 ] ,
+            not : settings.not ,
+            userAgent : settings.userAgent ,
+            clientenv : clientenv ,
+            addClass : addClass ,
+            removeClass : removeClass ,
+            filter : filter ,
+            is : is ,
+            data : data ,
+            reset : reset ,
+            end : function () { return jQuery( this[ 0 ] ) ; }
+          } ,
           validate : validate
         }
       ) ;
       
-      jQuery.extend
-      (
-        true ,
-        settings.response , 
-        plugin_data[ 1 ] ? plugin_data[ 1 ].response : {} ,{
-          0 : this[ 0 ] ,
-          not : settings.not ,
-          userAgent : settings.userAgent ,
-          clientenv : clientenv ,
-          addClass : addClass ,
-          removeClass : removeClass ,
-          filter : filter ,
-          is : is ,
-          data : data ,
-          reset : reset ,
-          end : function () { return context ; }
-        }
-      ) ;
       
       register( settings ) ;
-      plugin_data[ 1 ] = settings ;
+      !( plugin_data[ 1 ] instanceof Object ) && plugin_data.splice( 1 , 1 , {} ) ;
+      jQuery.extend( true , plugin_data[ 1 ] , settings ) ;
+      jQuery.extend( true , jQuery.clientenv , plugin_data[ 1 ].response ) ;
     } else {
-      plugin_data[ 1 ].context = this ;
       plugin_data[ 1 ].response[ 0 ] = this[ 0 ] ;
     } ;
+    jQuery.clientenv[ 0 ] = document.documentElement ;
     
     /* validate */ validate && validate.end() ;
     
