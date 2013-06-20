@@ -5,8 +5,8 @@
  * ---
  * @Copyright(c) 2013, falsandtru
  * @license MIT  http://opensource.org/licenses/mit-license.php  http://sourceforge.jp/projects/opensource/wiki/licenses%2FMIT_license
- * @version 0.1.5
- * @updated 2013/05/22
+ * @version 0.1.6
+ * @updated 2013/06/20
  * @author falsandtru  http://fat.main.jp/  http://sa-kusaku.sakura.ne.jp/
  * @CodingConventions Google JavaScript Style Guide
  * ---
@@ -68,7 +68,8 @@
       jQuery.extend
       (
         true ,
-        settings , {
+        settings ,
+        {
           nss : {
             class4html : nsArray.join( '-' ) ,
             array : nsArray
