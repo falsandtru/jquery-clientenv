@@ -5,8 +5,8 @@
  * ---
  * @Copyright(c) 2013, falsandtru
  * @license MIT  http://opensource.org/licenses/mit-license.php  http://sourceforge.jp/projects/opensource/wiki/licenses%2FMIT_license
- * @version 0.1.6
- * @updated 2013/06/20
+ * @version 0.1.7
+ * @updated 2013/07/12
  * @author falsandtru  http://fat.main.jp/  http://sa-kusaku.sakura.ne.jp/
  * @CodingConventions Google JavaScript Style Guide
  * ---
@@ -115,12 +115,15 @@
       
       var
         userAgent = settings.userAgent.toLowerCase() ,
-        response = {} ,
+        response = { os : {} , platform : {} , hardware : {} , browser : {} , attribute : {} , font : {} } ,
         property ;
       
       /* validate */ validate && validate.test( '2.2', 1, 0, 'os' ) ;
       OS : {
-        if ( plugin_data[ 1 ] && plugin_data[ 1 ].response.os && ( !settings.options || !settings.options.os ) ) { break OS ; } ;
+        if ( plugin_data[ 1 ] && plugin_data[ 1 ].response.os && ( !settings.options || !settings.options.os ) ) {
+          jQuery.extend( true , response.os , plugin_data[ 1 ].response.os ) ;
+          break OS ;
+        } ;
         
         response.os = {
           name              : '' ,
@@ -156,7 +159,10 @@
       
       /* validate */ validate && validate.test( '2.3', 1, 0, 'platform' ) ;
       PLATFORM : {
-        if ( plugin_data[ 1 ] && plugin_data[ 1 ].response.platform && ( !settings.options || !settings.options.platform ) ) { break PLATFORM ; } ;
+        if ( plugin_data[ 1 ] && plugin_data[ 1 ].response.platform && ( !settings.options || !settings.options.platform ) ) {
+          jQuery.extend( true , response.platform , plugin_data[ 1 ].response.platform ) ;
+          break PLATFORM ;
+        } ;
         
         response.platform = {
           name         : '' ,
@@ -184,7 +190,10 @@
       
       /* validate */ validate && validate.test( '2.4', 1, 0, 'hardware' ) ;
       HARDWARE : {
-        if ( plugin_data[ 1 ] && plugin_data[ 1 ].response.hardware && ( !settings.options || !settings.options.hardware ) ) { break HARDWARE ; } ;
+        if ( plugin_data[ 1 ] && plugin_data[ 1 ].response.hardware && ( !settings.options || !settings.options.hardware ) ) {
+          jQuery.extend( true , response.hardware , plugin_data[ 1 ].response.hardware ) ;
+          break HARDWARE ;
+        } ;
         
         response.hardware = {
           name   : '' ,
@@ -202,7 +211,10 @@
       
       /* validate */ validate && validate.test( '2.5', 1, 0, 'browser' ) ;
       BROWSER : {
-        if ( plugin_data[ 1 ] && plugin_data[ 1 ].response.browser && ( !settings.options || !settings.options.browser ) ) { break BROWSER ; } ;
+        if ( plugin_data[ 1 ] && plugin_data[ 1 ].response.browser && ( !settings.options || !settings.options.browser ) ) {
+          jQuery.extend( true , response.browser , plugin_data[ 1 ].response.browser ) ;
+          break BROWSER ;
+        } ;
         
         response.browser = {
           name      : '' ,
@@ -238,7 +250,10 @@
       
       /* validate */ validate && validate.test( '2.6', 1, 0, 'attribute' ) ;
       ATTRIBUTE : {
-        if ( plugin_data[ 1 ] && plugin_data[ 1 ].response.attribute && ( !settings.options || !settings.options.attribute ) ) { break ATTRIBUTE ; } ;
+        if ( plugin_data[ 1 ] && plugin_data[ 1 ].response.attribute && ( !settings.options || !settings.options.attribute ) ) {
+          jQuery.extend( true , response.attribute , plugin_data[ 1 ].response.attribute ) ;
+          break ATTRIBUTE ;
+        } ;
         
         response.attribute = {
           name : '' ,
@@ -253,7 +268,10 @@
       
       /* validate */ validate && validate.test( '2.7', 1, 0, 'font' ) ;
       FONT : {
-        if ( plugin_data[ 1 ] && plugin_data[ 1 ].response.font && ( !settings.options || !settings.options.font ) ) { break FONT ; } ;
+        if ( plugin_data[ 1 ] && plugin_data[ 1 ].response.font && ( !settings.options || !settings.options.font ) ) {
+          jQuery.extend( true , response.font , plugin_data[ 1 ].response.font ) ;
+          break FONT ;
+        } ;
         
         if ( !settings.font || !jQuery( 'body' ).length ) { break FONT ; } ;
         
@@ -317,7 +335,7 @@
           font = font4style.replace( /"|'/g , '' )
           for ( var j = 0 , len = base.length , source , format ; source = base[ j ] ; j++ ) {
             element.attr( 'style' , 'font-family: ' + font4style + ', ' + style.slice( !j ? 0 : style.indexOf( ', ' ) + 2 ) ) ;
-            if ( source[ 0 ].offsetWidth !== element[ 0 ].offsetWidth || source[ 0 ].offsetHeight !== element[ 0 ].offsetHeight ) {
+            if ( source[ 0 ].offsetWidth !== element[ 0 ].offsetWidth || source[ 0 ].offsetHeight !== element[ 0 ].offsetHeight || response.os.androidos || response.os.ios ) {
               response.font[ font ] = true ;
               response.font.support += ',' + font ;
               response.font.support4style += ',' + font4style ;
