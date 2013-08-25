@@ -5,9 +5,9 @@
  * ---
  * @Copyright(c) 2013, falsandtru
  * @license MIT  http://opensource.org/licenses/mit-license.php  http://sourceforge.jp/projects/opensource/wiki/licenses%2FMIT_license
- * @version 0.1.7
- * @updated 2013/07/12
- * @author falsandtru  http://fat.main.jp/  http://sa-kusaku.sakura.ne.jp/
+ * @version 0.1.8
+ * @updated 2013/08/25
+ * @author falsandtru https://github.com/falsandtru/
  * @CodingConventions Google JavaScript Style Guide
  * ---
  * Note: 
@@ -619,11 +619,9 @@
       /* validate */ var validate = plugin_data[ 1 ].validate ? plugin_data[ 1 ].validate.clone( { name : 'jquery.clientenv.js' } ) : false ;
       /* validate */ validate && validate.start() ;
       /* validate */ validate && validate.test( 1, 1, arguments, 'data()' ) ;
-      var response = { userAgent : this.userAgent } ;
+      var response = jQuery.extend( true , { userAgent : this.userAgent } , this ) ;
+      delete response[ 0 ] ;
       
-      for ( var i in this ) {
-        if ( i in this ) { typeof this[ i ] === 'object' && !isFinite( this[ i ].nodeType ) && ( response[ i ] = this[ i ] ) ; } ;
-      } ;
       /* validate */ validate && validate.test( 2, 1, response, 'response' ) ;
       /* validate */ validate && validate.end() ;
       return response ;
