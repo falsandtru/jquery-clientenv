@@ -5,7 +5,7 @@
  * ---
  * @Copyright(c) 2013, falsandtru
  * @license MIT  http://opensource.org/licenses/mit-license.php  http://sourceforge.jp/projects/opensource/wiki/licenses%2FMIT_license
- * @version 0.1.8
+ * @version 0.1.9
  * @updated 2013/08/25
  * @author falsandtru https://github.com/falsandtru/
  * @CodingConventions Google JavaScript Style Guide
@@ -23,22 +23,15 @@
  * 
  */
 
-( function () {
+( function ( jQuery ) {
   
-  if ( typeof window.jQuery === 'undefined' ) { return ; } ;
+  var win = window , doc = document , undefined = void( 0 ) , plugin_data = [ 'settings' ] ;
   
-  var $ = jQuery = window.jQuery , undefined = void( 0 ) , win = window , doc = document , plugin_data = [ 'settings' ] ;
-  
-  jQuery.fn.clientenv = clientenv ;
-  jQuery.clientenv = clientenv ;
-  
-  
-  function clientenv( options ) {
+  jQuery.fn.clientenv = jQuery.clientenv = function clientenv( options ) {
     
     if ( typeof this === 'function' || this === win ) { return arguments.callee.apply( jQuery( 'html' ) , arguments ) ; } ;
     
-    /* validate */ var validate = window.validator instanceof Object ? window.validator : false ;
-    /* validate */ var validate = validate ? validate.clone( { name : 'jquery.clientenv.js' , base : true } ) : validate ;
+    /* validate */ var validate = window.validator instanceof Object ? window.validator.clone( { name : 'jquery.clientenv.js' , base : true } ) : false ;
     /* validate */ validate && validate.start() ;
     /* validate */ validate && validate.test( '++', 1, 0, 'clientenv()' ) ;
     
@@ -637,4 +630,4 @@
       return 1 < plugin_data.length ? this : undefined ;
     }
   }
-} )() ;
+} )( jQuery ) ;
