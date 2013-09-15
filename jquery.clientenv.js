@@ -5,8 +5,8 @@
  * ---
  * @Copyright(c) 2013, falsandtru
  * @license MIT  http://opensource.org/licenses/mit-license.php  http://sourceforge.jp/projects/opensource/wiki/licenses%2FMIT_license
- * @version 0.1.9
- * @updated 2013/08/25
+ * @version 0.1.10
+ * @updated 2013/09/15
  * @author falsandtru https://github.com/falsandtru/
  * @CodingConventions Google JavaScript Style Guide
  * ---
@@ -27,7 +27,7 @@
   
   var win = window , doc = document , undefined = void( 0 ) , plugin_data = [ 'settings' ] ;
   
-  jQuery.fn.clientenv = jQuery.clientenv = function clientenv( options ) {
+  jQuery.fn.clientenv = jQuery.clientenv = function ( options ) {
     
     if ( typeof this === 'function' || this === win ) { return arguments.callee.apply( jQuery( 'html' ) , arguments ) ; } ;
     
@@ -71,7 +71,7 @@
             0 : this[ 0 ] ,
             not : settings.not ,
             userAgent : settings.userAgent ,
-            clientenv : clientenv ,
+            clientenv : arguments.callee ,
             addClass : addClass ,
             removeClass : removeClass ,
             filter : filter ,
@@ -390,7 +390,7 @@
         /* validate */ validate && validate.test( '++', 1, [ fproperty, fquery ], 'is( fproperty, fquery )' ) ;
         if ( this.is( fproperty , fquery ) ) {
           /* validate */ validate && validate.test( '++', 1, classname, 'true' ) ;
-          !this.not && !classname.indexOf( 'not-' ) ? null : jQuery( this[ 0 ] ).addClass( classname ) ;
+          !this.not && !classname.indexOf( 'not-' ) || jQuery( this[ 0 ] ).addClass( classname ) ;
         } else {
           /* validate */ validate && validate.test( '++', 1, classname, 'false' ) ;
           if ( fquery === undefined ) {
@@ -398,7 +398,7 @@
             /* validate */ validate && validate.test( '/', 1, 0, 'for end' ) ;
             continue ;
           } ;
-          !this.not ? null : jQuery( this[ 0 ] ).addClass( ( classname.indexOf( 'not-' ) ? 'not-' : '' ) + classname ) ;
+          !this.not || jQuery( this[ 0 ] ).addClass( ( classname.indexOf( 'not-' ) ? 'not-' : '' ) + classname ) ;
         } ;
         
         /* validate */ validate && validate.test( '/', 1, 0, 'for end' ) ;
@@ -435,7 +435,7 @@
         /* validate */ validate && validate.test( '++', 1, [ fproperty, fquery ], 'is( fproperty, fquery )' ) ;
         if ( this.is( fproperty , fquery ) ) {
           /* validate */ validate && validate.test( '++', 1, classname, 'true' ) ;
-          !this.not && !classname.indexOf( 'not-' ) ? null : jQuery( this[ 0 ] ).removeClass( classname ) ;
+          !this.not && !classname.indexOf( 'not-' ) || jQuery( this[ 0 ] ).removeClass( classname ) ;
         } else {
           /* validate */ validate && validate.test( '++', 1, classname, 'false' ) ;
           if ( fquery === undefined ) {
@@ -443,7 +443,7 @@
             /* validate */ validate && validate.test( '/', 1, 0, 'for end' ) ;
             continue ;
           } ;
-          !this.not ? null : jQuery( this[ 0 ] ).removeClass( ( classname.indexOf( 'not-' ) ? 'not-' : '' ) + classname ) ;
+          !this.not || jQuery( this[ 0 ] ).removeClass( ( classname.indexOf( 'not-' ) ? 'not-' : '' ) + classname ) ;
         } ;
         
         /* validate */ validate && validate.test( '/', 1, 0, 'for end' ) ;
