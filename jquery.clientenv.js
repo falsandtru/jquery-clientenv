@@ -5,8 +5,8 @@
  * ---
  * @Copyright(c) 2013, falsandtru
  * @license MIT  http://opensource.org/licenses/mit-license.php  http://sourceforge.jp/projects/opensource/wiki/licenses%2FMIT_license
- * @version 0.1.10
- * @updated 2013/09/15
+ * @version 0.1.11
+ * @updated 2013/11/13
  * @author falsandtru https://github.com/falsandtru/
  * @CodingConventions Google JavaScript Style Guide
  * ---
@@ -92,7 +92,7 @@
     } else {
       plugin_data[ 1 ].response[ 0 ] = this[ 0 ] ;
     } ;
-    jQuery.clientenv[ 0 ] = document.documentElement ;
+    jQuery.clientenv[ 0 ] = doc.documentElement ;
     
     /* validate */ validate && validate.end() ;
     
@@ -270,7 +270,7 @@
         
         var body , base , element , style , fonts , text , alphanumeric , symbol , lang ;
         
-        fonts = [ 'monospace' , 'fantasy' , 'cursive' , 'sans-serif' , 'serif' ]
+        fonts = [ 'monospace' , 'fantasy' , 'cursive' , 'sans-serif' , 'serif' ] ;
         
         style = 'font-size: 72px !important; ' +
                 'font-style: normal !important; ' +
@@ -284,7 +284,7 @@
                 'top: -9999px !important; ' +
                 'left: -9999px !important; ' +
                 'width: auto !important; ' +
-                'height: auto !important; '
+                'height: auto !important; ' ;
         
         alphanumeric = 'alphanumericmmmmmmmmm1234567890' ;
         
@@ -319,13 +319,13 @@
         base[ 1 ].attr( 'style' , 'font-family: ' + fonts.slice( 1 < fonts.length ? 1 : 0 ).join( ', ' ) + ' !important; ' + style ) ;
         
         style = fonts.join( ', ' ) + ' !important; ' + style ;
-        fonts = settings.font.family.split( /\s*,\s*/ )
+        fonts = settings.font.family.split( /\s*,\s*/ ) ;
         response.font = { support : '' , support4style : '' , notsupport : '' , notsupport4style : '' } ;
         
         element = jQuery( '<pre/>' ).text( text ) ;
         body.append( element ) ;
         for ( var i = 0 , font , font4style ; font4style = fonts[ i ] ; i++ ) {
-          font = font4style.replace( /"|'/g , '' )
+          font = font4style.replace( /"|'/g , '' ) ;
           for ( var j = 0 , len = base.length , source , format ; source = base[ j ] ; j++ ) {
             element.attr( 'style' , 'font-family: ' + font4style + ', ' + style.slice( !j ? 0 : style.indexOf( ', ' ) + 2 ) ) ;
             if ( source[ 0 ].offsetWidth !== element[ 0 ].offsetWidth || source[ 0 ].offsetHeight !== element[ 0 ].offsetHeight || response.os.androidos || response.os.ios ) {
@@ -565,6 +565,11 @@
           
         case property === 'browser' && !queries[ 0 ].indexOf( 'ie' ) :
           list = [
+              'ie15' ,
+              'ie14' ,
+              'ie13' ,
+              'ie12' ,
+              'ie11' ,
               'ie10' ,
               'ie9' ,
               'ie8' ,
