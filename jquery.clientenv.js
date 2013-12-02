@@ -5,8 +5,8 @@
  * ---
  * @Copyright(c) 2013, falsandtru
  * @license MIT  http://opensource.org/licenses/mit-license.php  http://sourceforge.jp/projects/opensource/wiki/licenses%2FMIT_license
- * @version 0.1.11
- * @updated 2013/11/13
+ * @version 0.1.12
+ * @updated 2013/12/03
  * @author falsandtru https://github.com/falsandtru/
  * @CodingConventions Google JavaScript Style Guide
  * ---
@@ -78,7 +78,7 @@
             is : is ,
             data : data ,
             reset : reset ,
-            end : function () { return jQuery( this[ 0 ] ) ; }
+            end : function () { return jQuery( this ) ; }
           } ,
           validate : validate
         }
@@ -368,7 +368,7 @@
       /* validate */ var validate = plugin_data[ 1 ].validate ? plugin_data[ 1 ].validate.clone( { name : 'jquery.clientenv.js' } ) : false ;
       /* validate */ validate && validate.start() ;
       /* validate */ validate && validate.test( 1, 1, arguments, 'addClass()' ) ;
-      var fproperty , fquery , classname ;
+      var fproperty , fquery , classname, result ;
       
       if ( !this[ 0 ] || !property ) {
         /* validate */ validate && validate.end() ;
@@ -413,7 +413,7 @@
       /* validate */ var validate = plugin_data[ 1 ].validate ? plugin_data[ 1 ].validate.clone( { name : 'jquery.clientenv.js' } ) : false ;
       /* validate */ validate && validate.start() ;
       /* validate */ validate && validate.test( 1, 1, arguments, 'removeClass()' ) ;
-      var fproperty , fquery , classname ;
+      var fproperty , fquery , classname, result ;
       
       if ( !this[ 0 ] || !property ) {
         /* validate */ validate && validate.end() ;
