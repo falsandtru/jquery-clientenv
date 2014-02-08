@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>QUnit Example</title>
+  <link rel="stylesheet" href="//code.jquery.com/qunit/qunit-1.14.0.css">
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+  <script src="//code.jquery.com/qunit/qunit-1.14.0.js"></script>
+  <script src="/lib/jquery.clientenv.dev.js"></script>
+</head>
+<body>
+  <div id="qunit"></div>
+  <div id="qunit-fixture"></div>
+<script>
+test( "hello test", function() {
+  ok( 1 == "1", "Passed!" );
+	
+  ok( $.clientenv(), "init" );
+  
+  equal( typeof $.clientenv.hardware.name, 'string', "hardware" );
+  equal( typeof $.clientenv.platform.name, 'string', "platform" );
+  equal( typeof $.clientenv.os.name, 'string', "os" );
+  equal( typeof $.clientenv.browser.name, 'string', "browser" );
+  equal( typeof $.clientenv.font.name, 'string', "font" );
+  equal( typeof $.clientenv.attribute.name, 'string', "attribute" );
+  
+  equal( typeof $.clientenv().hardware.name, 'string', "hardware" );
+  equal( typeof $.clientenv().platform.name, 'string', "platform" );
+  equal( typeof $.clientenv().os.name, 'string', "os" );
+  equal( typeof $.clientenv().browser.name, 'string', "browser" );
+  equal( typeof $.clientenv().font.name, 'string', "font" );
+  equal( typeof $.clientenv().attribute.name, 'string', "attribute" );
+  
+  ok( $.clientenv.reset(), "reset" );
+  ok( $.clientenv().reset(), "reset" );
+	
+  equal( typeof $.clientenv.hardware.name, 'string', "hardware" );
+  equal( typeof $.clientenv.platform.name, 'string', "platform" );
+  equal( typeof $.clientenv.os.name, 'string', "os" );
+  equal( typeof $.clientenv.browser.name, 'string', "browser" );
+  equal( typeof $.clientenv.font.name, 'string', "font" );
+  equal( typeof $.clientenv.attribute.name, 'string', "attribute" );
+  
+  equal( typeof $.clientenv().hardware.name, 'string', "hardware" );
+  equal( typeof $.clientenv().platform.name, 'string', "platform" );
+  equal( typeof $.clientenv().os.name, 'string', "os" );
+  equal( typeof $.clientenv().browser.name, 'string', "browser" );
+  equal( typeof $.clientenv().font.name, 'string', "font" );
+  equal( typeof $.clientenv().attribute.name, 'string', "attribute" );
+  
+  ok( $.clientenv( {
+    userAgent: "Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; .NET4.0C; .NET4.0E; rv:11.0) like Gecko",
+    strict: { ie: true }
+  } ), "IE11" );
+  
+  equal( $.clientenv.hardware.name, 'pc', "hardware" );
+  equal( $.clientenv.platform.name, 'windows', "platform" );
+  equal( $.clientenv.os.name, 'windows7', "os" );
+  equal( $.clientenv.browser.name, 'ie11', "browser" );
+  
+  equal( $.clientenv().hardware.name, 'pc', "hardware" );
+  equal( $.clientenv().platform.name, 'windows', "platform" );
+  equal( $.clientenv().os.name, 'windows7', "os" );
+  equal( $.clientenv().browser.name, 'ie11', "browser" );
+  
+  equal( typeof $.clientenv.is, 'function', "is" );
+  equal( typeof $.clientenv().is, 'function', "is" );
+  equal( $.clientenv.is('browser', 'ie11'), true, "is" );
+  equal( $.clientenv.is('os', 'ie11'), false, "is" );
+  equal( $.clientenv.is('ie11'), true, "is" );
+  equal( $.clientenv.is('ie10'), false, "is" );
+  equal( $.clientenv.is('mac, ie11, chrome'), true, "is" );
+  equal( $.clientenv.is('mac, ie10, chrome'), false, "is" );
+	
+  //equal( typeof $.clientenv.filter, 'function', "filter" );
+  equal( typeof $.clientenv().filter, 'function', "filter" );
+  equal( !!$(document).clientenv().filter('browser', 'ie11').length, true, "filter" );
+  equal( !!$(document).clientenv().filter('os', 'ie11').length, false, "filter" );
+  equal( !!$(document).clientenv().filter('ie11').length, true, "filter" );
+  equal( !!$(document).clientenv().filter('ie10').length, false, "filter" );
+  equal( !!$(document).clientenv().filter('mac, ie11, chrome').length, true, "filter" );
+  equal( !!$(document).clientenv().filter('mac, ie10, chrome').length, false, "filter" );
+	
+  equal( typeof $.clientenv.addClass, 'function', "addClass" );
+  equal( typeof $.clientenv().addClass, 'function', "addClass" );
+  equal( typeof $.clientenv.removeClass, 'function', "removeClass" );
+  equal( typeof $.clientenv().removeClass, 'function', "removeClass" );
+	$.clientenv.addClass('browser', 'ie11')
+  equal( $('html').is('.ie11'), true, "addClass" );
+	$.clientenv.removeClass('browser', 'ie11')
+  equal( $('html').is('.ie11'), false, "removeClass" );
+	$.clientenv.addClass('ie11')
+  equal( $('html').is('.ie11'), true, "addClass" );
+	$.clientenv.removeClass('ie11')
+  equal( $('html').is('.ie11'), false, "removeClass" );
+	$.clientenv.addClass('hardware platform os windowsXP:lte windowsXP:gt browser ie ie8:lte')
+  equal( $('html').is('.pc'), true, "addClass" );
+  equal( $('html').is('.windows'), true, "addClass" );
+  equal( $('html').is('.windows7'), true, "addClass" );
+  equal( $('html').is('.not-lte-windowsXP'), true, "addClass" );
+  equal( $('html').is('.gt-windowsXP'), true, "addClass" );
+  equal( $('html').is('.ie11'), true, "addClass" );
+  equal( $('html').is('.ie'), true, "addClass" );
+  equal( $('html').is('.not-lte-ie8'), true, "addClass" );
+	$.clientenv.removeClass('hardware platform os windowsXP:lte windowsXP:gt browser ie ie8:lte')
+  equal( $('html').is('.pc'), false, "removeClass" );
+  equal( $('html').is('.windows'), false, "removeClass" );
+  equal( $('html').is('.windows7'), false, "removeClass" );
+  equal( $('html').is('.not-lte-windowsXP'), false, "removeClass" );
+  equal( $('html').is('.gt-windowsXP'), false, "removeClass" );
+  equal( $('html').is('.ie11'), false, "removeClass" );
+  equal( $('html').is('.ie'), false, "removeClass" );
+  equal( $('html').is('.not-lte-ie8'), false, "removeClass" );
+	
+	$('body').clientenv().addClass('ie11');
+  equal( $('body').is('.ie11'), true, "context" );
+	$('body').clientenv().removeClass('ie11');
+  equal( $('body').is('.ie11'), false, "context" );
+	
+  equal( $.clientenv.is !== $.is, true, "not overwrite" );
+  equal( $().clientenv().is !== $().is, true, "not overwrite" );
+});
+</script>
+</body>
+</html>
