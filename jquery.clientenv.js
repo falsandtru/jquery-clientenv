@@ -5,8 +5,8 @@
  * ---
  * @Copyright(c) 2013, falsandtru
  * @license MIT  http://opensource.org/licenses/mit-license.php  http://sourceforge.jp/projects/opensource/wiki/licenses%2FMIT_license
- * @version 0.1.12
- * @updated 2013/12/03
+ * @version 0.2.0
+ * @updated 2014/02/08
  * @author falsandtru https://github.com/falsandtru/
  * @CodingConventions Google JavaScript Style Guide
  * ---
@@ -17,131 +17,254 @@
  * @jquery 1.7.2
  * 
  * $.clientenv();
- * $.clientenv().is('os', 'windowsXP:lte');
- * $.clientenv().addClass('browser').addClass('ie8:lte');
+ * $.clientenv.is('os', 'windowsXP:lte');
+ * $.clientenv.addClass('browser').addClass('ie8:lte');
  * $(function(){ $.clientenv({'font':'Meiryo, "メイリオ"'}).addClass('font', 'Meiryo, メイリオ', 'meiryo'); });
  * 
  */
 
-( function ( jQuery ) {
+( function ( jQuery, window, document, undefined ) {
   
-  var win = window , doc = document , undefined = void( 0 ) , plugin_data = [ 'settings' ] ;
+  var Store ;
   
-  jQuery.fn.clientenv = jQuery.clientenv = function ( options ) {
-    
-    if ( typeof this === 'function' || this === win ) { return arguments.callee.apply( jQuery( 'html' ) , arguments ) ; } ;
-    
-    /* validate */ var validate = window.validator instanceof Object ? window.validator.clone( { name : 'jquery.clientenv.js' , base : true } ) : false ;
-    /* validate */ validate && validate.start() ;
-    /* validate */ validate && validate.test( '++', 1, 0, 'clientenv()' ) ;
-    
-    var
-      defaults = {
-        id : 0 ,
-        gns : 'clientenv' ,
-        ns : undefined ,
-        userAgent : win.navigator.userAgent ,
-        hardware : true ,
-        platform : true ,
-        os : true ,
-        browser : true ,
-        font : { family : jQuery( 'body' )[ 0 ] ? jQuery( 'body' ).css( 'font-family' ) : '' , symbol : true , lang : 'en' } ,
-        attribute : true ,
-        support : true ,
-        strict : { ie : false } ,
-        not : true ,
-        options : options
-      } ,
-      settings = jQuery.extend( true , {} , defaults , options ) ,
-      nsArray = [ settings.gns ].concat( settings.ns || [] ) ;
-    
-    if ( 1 === plugin_data.length || arguments.length ) {
-      settings.id = 1 ;
+  function registrate( jQuery, window, document, undefined, Store ) {
+    jQuery.fn[ Store.name ] = jQuery[ Store.name ] = function () {
       
-      jQuery.extend
-      (
-        true ,
-        settings ,
-        {
-          nss : {
-            class4html : nsArray.join( '-' ) ,
-            array : nsArray
-          } ,
-          response : {
-            0 : this[ 0 ] ,
-            not : settings.not ,
-            userAgent : settings.userAgent ,
-            clientenv : arguments.callee ,
-            addClass : addClass ,
-            removeClass : removeClass ,
-            filter : filter ,
-            is : is ,
-            data : data ,
-            reset : reset ,
-            end : function () { return jQuery( this ) ; }
-          } ,
-          validate : validate
-        }
-      ) ;
-      
-      
-      register( settings ) ;
-      !( plugin_data[ 1 ] instanceof Object ) && plugin_data.splice( 1 , 1 , {} ) ;
-      jQuery.extend( true , plugin_data[ 1 ] , settings ) ;
-      jQuery.extend( true , jQuery.clientenv , plugin_data[ 1 ].response ) ;
-    } else {
-      plugin_data[ 1 ].response[ 0 ] = this[ 0 ] ;
+      return initialize.apply( this, [
+        jQuery, window, document, undefined, Store
+      ].concat( [].slice.call( arguments ) ) ) ;
     } ;
-    jQuery.clientenv[ 0 ] = doc.documentElement ;
+    Store.setProperties.call( jQuery[ Store.name ] ) ;
+  }
+  
+  function initialize( jQuery, window, document, undefined, Store, option ) {
     
-    /* validate */ validate && validate.end() ;
+    var $context = this ;
     
-    return 1 < plugin_data.length ? plugin_data[ 1 ].response : undefined ;
+    // polymorphism
+    switch ( true ) {
+      default:
+        $context = $context instanceof jQuery ? $context : jQuery[ Store.name ] ;
+        $context = Store.setProperties.call( $context, null, null ) ;
+    }
     
+    // setting
+    var setting ;
+    setting = jQuery.extend( true,
+      {
+        id: 0,
+        gns: Store.name,
+        ns: undefined,
+        userAgent: window.navigator.userAgent,
+        hardware: true,
+        platform: true,
+        os: true,
+        browser: true,
+        font: { family: jQuery( 'body' )[ 0 ] ? jQuery( 'body' ).css( 'font-family' ) : '', symbol: true, lang: 'en' },
+        attribute: true,
+        support: true,
+        strict: { ie: false },
+        not: true
+      },
+      option
+    ) ;
     
-    /* function */
+    setting.nss = {
+      array: [ Store.name ].concat( setting.ns && String( setting.ns ).split( '.' ) || [] )
+    } ;
+    jQuery.extend
+    (
+      true,
+      setting = setting.scope && Store.scope( setting ) || setting,
+      {
+        nss: {
+          name: setting.ns || '',
+          alias: Store.alias ? [ Store.alias ].concat( setting.nss.array.slice( 1 ) ).join( '.' ) : false,
+          event: setting.nss.array.join( '.' ),
+          data: setting.nss.array.join( '-' ),
+          class4html: setting.nss.array.join( '-' )
+        },
+        option: option
+      }
+    ) ;
     
-    function register( settings ) {
+    // registrate
+    Store.registrate.call( $context, jQuery, window, document, undefined, Store, setting ) ;
+    
+    return $context ; // function: pjax
+  }
+  
+  Store = {
+    name: 'clientenv',
+    alias: '',
+    ids: [],
+    settings: [0],
+    count: 0,
+    parseHTML: null,
+    setAlias:  function ( name ) {
+      Store.alias = typeof name === 'string' ? name : Store.alias ;
+      if ( Store.name !== Store.alias && !jQuery[ Store.alias ] ) {
+        jQuery[ Store.name ][ Store.alias ] = jQuery.fn[ Store.name ] ;
+        jQuery.fn[ Store.alias ] = jQuery[ Store.alias ] = jQuery.fn[ Store.name ] ;
+      }
+    },
+    setProperties: function ( namespace, element ) {
       
-      /* validate */ validate && validate.test( 2, 1, 0, 'plugin register' ) ;
-      /* validate */ validate && validate.test( '2.1', 1, 0, 'variable' ) ;
+      var $context = this ;
+      
+      if ( $context instanceof jQuery || $context === jQuery[ Store.name ] ) {
+        
+        $context = $context instanceof jQuery && element !== undefined ? $context.add( element ) : $context ;
+        
+        $context[ Store.name ] = jQuery[ Store.name ] ;
+        
+        $context.addClass = function ( property, query, key ) {
+          var $context, setting, fproperty, fquery, classname, result ;
+          $context = this[0] ? this : jQuery( 'html' ) ;
+          setting = Store.settings[ 1 ] ;
+          
+          if ( !property ) {
+            return this ;
+          } ;
+          
+          for ( var i = 0, properties = property.split( /\s+/ ) ; property = properties[ i ] ; i++ ) {
+            
+            result = Store.format.apply( this, [ property, query ] ) ;
+            fproperty = result[ 0 ] ;
+            fquery = result[ 1 ] ;
+            
+            classname = key || fquery || Store.reference.apply( this, [ fproperty, fquery ] ) ;
+            
+            if ( this.is( fproperty, fquery ) ) {
+              !setting.not && !classname.indexOf( 'not-' ) || jQuery( $context ).addClass( classname ) ;
+            } else {
+              if ( fquery === undefined ) {
+                continue ;
+              } ;
+              !setting.not || jQuery( $context ).addClass( ( classname.indexOf( 'not-' ) ? 'not-' : '' ) + classname ) ;
+            } ;
+          } ;
+          
+          return this ;
+        } ;
+        
+        $context.removeClass = function ( property, query, key ) {
+          var $context, setting, fproperty, fquery, classname, result ;
+          $context = this[0] ? this : jQuery( 'html' ) ;
+          setting = Store.settings[ 1 ] ;
+          
+          if ( !property ) {
+            return this ;
+          } ;
+          
+          for ( var i = 0, properties = property.split( /\s+/ ) ; property = properties[ i ] ; i++ ) {
+            
+            result = Store.format.apply( this, [ property, query ] ) ;
+            fproperty = result[ 0 ] ;
+            fquery = result[ 1 ] ;
+            
+            classname = key || fquery || Store.reference.apply( this, [ fproperty, fquery ] ) ;
+            
+            if ( this.is( fproperty, fquery ) ) {
+              !setting.not && !classname.indexOf( 'not-' ) || jQuery( $context ).removeClass( classname ) ;
+            } else {
+              if ( fquery === undefined ) {
+                
+                continue ;
+              } ;
+              !setting.not || jQuery( $context ).removeClass( ( classname.indexOf( 'not-' ) ? 'not-' : '' ) + classname ) ;
+            } ;
+            
+          } ;
+          
+          return this ;
+        } ;
+        
+        $context.filter = function ( property, query ) {
+          return this.not( this.is( property, query ) ? '' : '*' ) ;
+        } ;
+        
+        $context.is = function ( property, query ) {
+          var properties, queries, result = 0 ;
+          
+          properties = property.replace( /"|'/g, '' ).split( /\s*,\s*/ ) ;
+          queries = query === undefined || query === 'name' ? [ 'name' ] : query.replace( /"|'/g, '' ).split( /\s*,\s*/ ) ;
+          for ( var i = 0, property ; property = properties[ i ] ; i++ ) {
+            for ( var j = 0, query ; query = queries[ j ] ; j++ ) {
+              query = Store.format.apply( this, [ property, query ] ) ;
+              property = query[ 0 ] ;
+              query = query[ 1 ] ;
+              
+              result += Store.reference.apply( this, [ property, query ] ) ? 1 : 0 ;
+            } ;
+          } ;
+          result = query !== undefined && 0 === query.indexOf( 'not-' ) ? !result : result ;
+          return Boolean( result ) ;
+        } ;
+        
+        $context.data = function () {
+          var response = jQuery.extend( true, { userAgent: this.userAgent }, this ) ;
+          delete response[ 0 ] ;
+          
+          return response ;
+        } ;
+        
+        $context.reset = function ( option ) {
+          1 < Store.settings.length && Store.settings.splice( 1, 1 ) ;
+          jQuery[ Store.name ]( option ) ;
+          return 1 < Store.settings.length ? this : undefined ;
+        } ;
+        
+      }
+      return $context ;
+    },
+    registrate: function ( jQuery, window, document, undefined, Store, setting ) {
+      
+      var context = this ;
+      
+      setting.id = 1 ;
+      Store.ids.push( setting.id ) ;
+      Store.settings[ setting.id ] = setting ;
       
       var
-        userAgent = settings.userAgent.toLowerCase() ,
-        response = { os : {} , platform : {} , hardware : {} , browser : {} , attribute : {} , font : {} } ,
+        userAgent = setting.userAgent.toLowerCase(),
+        response = { os: {}, platform: {}, hardware: {}, browser: {}, attribute: {}, font: {} },
         property ;
       
-      /* validate */ validate && validate.test( '2.2', 1, 0, 'os' ) ;
-      OS : {
-        if ( plugin_data[ 1 ] && plugin_data[ 1 ].response.os && ( !settings.options || !settings.options.os ) ) {
-          jQuery.extend( true , response.os , plugin_data[ 1 ].response.os ) ;
+      for ( var i in response ) {
+        response[ i ] = jQuery[ Store.name ][ i ] ;
+      }
+      
+
+      OS: {
+        if ( response.os && ( !setting.option || !setting.option.os && !setting.option.userAgent ) ) {
           break OS ;
         } ;
         
         response.os = {
-          name              : '' ,
-          windows8          : /Win(dows )?NT 6\.2/i.test( userAgent ) && 0 > userAgent.indexOf( 'arm' ) ,
-          windowsRT         : /Win(dows )?NT 6\.2/i.test( userAgent ) && -1 < userAgent.indexOf( 'arm' ) ,
-          windows7          : /Win(dows )?NT 6\.1/i.test( userAgent ) ,
-          windowsVista      : /Win(dows )?NT 6\.0/i.test( userAgent ) ,
-          windowsServer2003 : /Win(dows )?NT 5\.2/i.test( userAgent ) ,
-          windowsXP         : /Win(dows )?(NT 5\.1|XP)/i.test( userAgent ) ,
-          windowsME         : /Win(dows )?(9x 4\.90|ME)/i.test( userAgent ) ,
-          windows2000       : /Win(dows )?(NT 5\.0|2000)/i.test( userAgent ) ,
-          windows98         : /Win(dows )?98/i.test( userAgent ) ,
-          windowsNT         : /Win(dows )?NT( [3-4]\.0| [^0-9]+[^.])/i.test( userAgent ) ,
-          windows95         : /Win(dows )?95/i.test( userAgent ) ,
-          'osx10.8'         : /Mac OS X 10[._]8/i.test( userAgent ) ,
-          'osx10.7'         : /Mac OS X 10[._]7/i.test( userAgent ) ,
-          'osx10.6'         : /Mac OS X 10[._]6/i.test( userAgent ) ,
-          'osx10.5'         : /Mac OS X 10[._]5/i.test( userAgent ) ,
-          'osx10.4'         : /Mac OS X 10[._]4/i.test( userAgent ) ,
-          'osx10.3'         : /Mac OS X 10[._]3/i.test( userAgent ) ,
-          'osx10.2'         : /Mac OS X 10[._]2/i.test( userAgent ) ,
-          'osx10.1'         : /Mac OS X 10[._]1/i.test( userAgent ) ,
-          'osx10.0'         : /Mac OS X 10[._]0/i.test( userAgent ) ,
-          ios               : -1 < userAgent.indexOf( 'iphone os' ) || -1 < userAgent.indexOf( 'like mac OS x' ) ,
-          androidos         : -1 < userAgent.indexOf( 'android' ) ,
+          name              : '',
+          windows8          : /Win(dows )?NT 6\.2/i.test( userAgent ) && 0 > userAgent.indexOf( 'arm' ),
+          windowsRT         : /Win(dows )?NT 6\.2/i.test( userAgent ) && -1 < userAgent.indexOf( 'arm' ),
+          windows7          : /Win(dows )?NT 6\.1/i.test( userAgent ),
+          windowsVista      : /Win(dows )?NT 6\.0/i.test( userAgent ),
+          windowsServer2003 : /Win(dows )?NT 5\.2/i.test( userAgent ),
+          windowsXP         : /Win(dows )?(NT 5\.1|XP)/i.test( userAgent ),
+          windowsME         : /Win(dows )?(9x 4\.90|ME)/i.test( userAgent ),
+          windows2000       : /Win(dows )?(NT 5\.0|2000)/i.test( userAgent ),
+          windows98         : /Win(dows )?98/i.test( userAgent ),
+          windowsNT         : /Win(dows )?NT( [3-4]\.0| [^0-9]+[^.])/i.test( userAgent ),
+          windows95         : /Win(dows )?95/i.test( userAgent ),
+          'osx10.8'         : /Mac OS X 10[._]8/i.test( userAgent ),
+          'osx10.7'         : /Mac OS X 10[._]7/i.test( userAgent ),
+          'osx10.6'         : /Mac OS X 10[._]6/i.test( userAgent ),
+          'osx10.5'         : /Mac OS X 10[._]5/i.test( userAgent ),
+          'osx10.4'         : /Mac OS X 10[._]4/i.test( userAgent ),
+          'osx10.3'         : /Mac OS X 10[._]3/i.test( userAgent ),
+          'osx10.2'         : /Mac OS X 10[._]2/i.test( userAgent ),
+          'osx10.1'         : /Mac OS X 10[._]1/i.test( userAgent ),
+          'osx10.0'         : /Mac OS X 10[._]0/i.test( userAgent ),
+          ios               : -1 < userAgent.indexOf( 'iphone os' ) || -1 < userAgent.indexOf( 'like mac OS x' ),
+          androidos         : -1 < userAgent.indexOf( 'android' ),
           otherOS           : false
         } ;
         
@@ -150,30 +273,28 @@
         if ( !response.os.name ) { response.os.name = 'otherOS' ; response.os.otherOS = true ; } ;
       } ;
       
-      /* validate */ validate && validate.test( '2.3', 1, 0, 'platform' ) ;
-      PLATFORM : {
-        if ( plugin_data[ 1 ] && plugin_data[ 1 ].response.platform && ( !settings.options || !settings.options.platform ) ) {
-          jQuery.extend( true , response.platform , plugin_data[ 1 ].response.platform ) ;
+      PLATFORM: {
+        if ( response.platform && ( !setting.option || !setting.option.platform && !setting.option.userAgent ) ) {
           break PLATFORM ;
         } ;
         
         response.platform = {
-          name         : '' ,
-          windows      : -1 < userAgent.indexOf( 'windows' ) ,
-          mac          : -1 < userAgent.indexOf( 'macintosh' ) ,
-          linux        : -1 < userAgent.indexOf( 'x11' ) ,
-          android      : -1 < userAgent.indexOf( 'android' ) ,
-          iphone       : -1 < userAgent.indexOf( 'iphone' ) ,
-          ipad         : -1 < userAgent.indexOf( 'ipad' ) ,
-          ipod         : -1 < userAgent.indexOf( 'ipod' ) ,
-          windowsPhone : -1 < userAgent.indexOf( 'windows phone' ) ,
-          blackberry   : -1 < userAgent.indexOf( 'blackberry' ) ,
-          wii          : -1 < userAgent.indexOf( 'nintendo wii' ) ,
-          ds           : -1 < userAgent.indexOf( 'nitro' ) ,
-          psp          : -1 < userAgent.indexOf( 'psp' ) ,
-          ps2          : -1 < userAgent.indexOf( 'ps2' ) ,
-          ps3          : -1 < userAgent.indexOf( 'playstation 3' ) ,
-          otherPlatform : false
+          name         : '',
+          windows      : -1 < userAgent.indexOf( 'windows' ),
+          mac          : -1 < userAgent.indexOf( 'macintosh' ),
+          linux        : -1 < userAgent.indexOf( 'x11' ),
+          android      : -1 < userAgent.indexOf( 'android' ),
+          iphone       : -1 < userAgent.indexOf( 'iphone' ),
+          ipad         : -1 < userAgent.indexOf( 'ipad' ),
+          ipod         : -1 < userAgent.indexOf( 'ipod' ),
+          windowsPhone : -1 < userAgent.indexOf( 'windows phone' ),
+          blackberry   : -1 < userAgent.indexOf( 'blackberry' ),
+          wii          : -1 < userAgent.indexOf( 'nintendo wii' ),
+          ds           : -1 < userAgent.indexOf( 'nitro' ),
+          psp          : -1 < userAgent.indexOf( 'psp' ),
+          ps2          : -1 < userAgent.indexOf( 'ps2' ),
+          ps3          : -1 < userAgent.indexOf( 'playstation 3' ),
+          otherPlatform: false
         } ;
         
         property = response.platform ;
@@ -181,20 +302,18 @@
         if ( !response.platform.name ) { response.platform.name = 'otherPlatform' ; response.platform.otherPlatform = true ; } ;
       } ;
       
-      /* validate */ validate && validate.test( '2.4', 1, 0, 'hardware' ) ;
-      HARDWARE : {
-        if ( plugin_data[ 1 ] && plugin_data[ 1 ].response.hardware && ( !settings.options || !settings.options.hardware ) ) {
-          jQuery.extend( true , response.hardware , plugin_data[ 1 ].response.hardware ) ;
+      HARDWARE: {
+        if ( response.hardware && ( !setting.option || !setting.option.hardware && !setting.option.userAgent ) ) {
           break HARDWARE ;
         } ;
         
         response.hardware = {
-          name   : '' ,
-          pc     : response.platform.windows || response.platform.mac ,
-          mobile : -1 < userAgent.indexOf( 'mobile' ) ,
-          tablet : -1 < userAgent.indexOf( 'tablet' ) ,
-          game   : response.platform.wii || response.platform.ds || response.platform.psp || response.platform.ps2 || response.platform.ps3 ,
-          otherHardware : false
+          name   : '',
+          pc     : response.platform.windows || response.platform.mac,
+          mobile : -1 < userAgent.indexOf( 'mobile' ),
+          tablet : -1 < userAgent.indexOf( 'tablet' ),
+          game   : response.platform.wii || response.platform.ds || response.platform.psp || response.platform.ps2 || response.platform.ps3,
+          otherHardware: false
         } ;
         
         property = response.hardware ;
@@ -202,34 +321,33 @@
         if ( !response.hardware.name ) { response.hardware.name = 'otherHardware' ; response.hardware.otherHardware = true ; } ;
       } ;
       
-      /* validate */ validate && validate.test( '2.5', 1, 0, 'browser' ) ;
-      BROWSER : {
-        if ( plugin_data[ 1 ] && plugin_data[ 1 ].response.browser && ( !settings.options || !settings.options.browser ) ) {
-          jQuery.extend( true , response.browser , plugin_data[ 1 ].response.browser ) ;
+      BROWSER: {
+        if ( response.browser && ( !setting.option || !setting.option.browser && !setting.option.userAgent ) ) {
           break BROWSER ;
         } ;
         
         response.browser = {
-          name      : '' ,
-          version   : ( userAgent.match( /(?:chrome|firefox|safari|msie|opera(?:\/.+ version)?|version)[\/:\s]([\d.]+)/ ) || [] )[ 1 ] ,
-          chrome    : -1 < userAgent.indexOf( 'chrome' ) ,
-          safari    : -1 < userAgent.indexOf( 'safari' ) && 0 > userAgent.indexOf( 'chrome' ) ,
-          opera     : -1 < userAgent.indexOf( 'opera' ) && !response.platform.wii && !response.platform.ds ,
-          firefox   : -1 < userAgent.indexOf( 'firefox' ) ,
-          mozilla   : -1 < userAgent.indexOf( 'mozilla' ) && 0 > userAgent.indexOf( 'compatible' ) && 0 > userAgent.indexOf( 'webkit' ) && 0 > userAgent.indexOf( 'firefox' ) ,
-          lunascape : -1 < userAgent.indexOf( 'lunascape' ) ,
-          sleipnir  : -1 < userAgent.indexOf( 'sleipnir' ) ,
-          ie        : -1 < userAgent.indexOf( 'msie' ) && 0 > userAgent.indexOf( 'opera' ) ,
-          otherBrowser : false
+          name      : '',
+          version   : ( userAgent.match( /(?:chrome|firefox|safari|msie|rv|opera(?:\/.+ version)?|version)[\/:\s]([\d.]+)/ ) || [] )[ 1 ],
+          chrome    : -1 < userAgent.indexOf( 'chrome' ),
+          safari    : -1 < userAgent.indexOf( 'safari' ) && 0 > userAgent.indexOf( 'chrome' ),
+          opera     : -1 < userAgent.indexOf( 'opera' ) && !response.platform.wii && !response.platform.ds,
+          firefox   : -1 < userAgent.indexOf( 'firefox' ),
+          mozilla   : -1 < userAgent.indexOf( 'mozilla' ) && 0 > userAgent.indexOf( 'compatible' ) && 0 > userAgent.indexOf( 'webkit' ) && 0 > userAgent.indexOf( 'firefox' ),
+          lunascape : -1 < userAgent.indexOf( 'lunascape' ),
+          sleipnir  : -1 < userAgent.indexOf( 'sleipnir' ),
+          ie        : -1 < userAgent.indexOf( 'msie' ) && 0 > userAgent.indexOf( 'opera' ) || -1 < userAgent.indexOf( 'trident' ) &&  -1 < userAgent.indexOf( 'rv:' ),
+          otherBrowser: false
         } ;
         
-        for ( var i = 5 , element ; i <= 10 ; i++ ) {
-          response.browser[ 'ie' + i ] = Boolean( response.browser.ie && 0 === response.browser.version.indexOf( i ) && 0 > userAgent.indexOf( 'opera' ) ) ;
+        for ( var i = 5, element ; i <= 15 ; i++ ) {
+          response.browser[ 'ie' + i ] = Boolean( response.browser.ie && 0 === response.browser.version.indexOf( i ) ) ;
         } ;
         
-        if ( response.browser.ie && settings.strict.ie ) {
-          response.browser[ 'ie' ] = Boolean( jQuery( '<!--[if IE ]><wbr><![endif]-->' ).length && jQuery( '<!--[if IE ]><wbr><![endif]-->' )[ 0 ].nodeType === 1 ) ;
-          for ( var i = 5 , element ; i <= 9 ; i++ ) {
+        if ( setting.strict.ie ) {
+          response.browser[ 'ie' ] = response.browser.ie && /^\d{2}\./.test( response.browser.version ) ||
+					                           Boolean( jQuery( '<!--[if IE ]><wbr><![endif]-->' ).length && jQuery( '<!--[if IE ]><wbr><![endif]-->' )[ 0 ].nodeType === 1 ) ;
+          for ( var i = 5, element ; i <= 9 ; i++ ) {
             element = jQuery( '<!--[if IE ' + i + ']><wbr><![endif]-->' ) ;
             response.browser[ 'ie' + i ] = Boolean( element.length && element[ 0 ].nodeType === 1 ) ;
             element = null ;
@@ -241,36 +359,33 @@
         if ( !response.browser.name ) { response.browser.name = 'otherBrowser' ; response.browser.otherBrowser = true ; } ;
       } ;
       
-      /* validate */ validate && validate.test( '2.6', 1, 0, 'attribute' ) ;
-      ATTRIBUTE : {
-        if ( plugin_data[ 1 ] && plugin_data[ 1 ].response.attribute && ( !settings.options || !settings.options.attribute ) ) {
-          jQuery.extend( true , response.attribute , plugin_data[ 1 ].response.attribute ) ;
+      ATTRIBUTE: {
+        if ( response.attribute && ( !setting.option || !setting.option.attribute && !setting.option.userAgent ) ) {
           break ATTRIBUTE ;
         } ;
         
+
         response.attribute = {
-          name : '' ,
+          name  : '',
           touch : -1 < userAgent.indexOf( 'touch' ) ||
                        response.hardware.tablet ||
                        response.platform.iphone ||
                        response.platform.ipad ||
-                       ( response.platform.android && response.hardware.mobile ) ,
-          bot : /Bot\W|Robot|Crawler|Spider/i.test( userAgent )
+                       ( response.platform.android && response.hardware.mobile ),
+          bot   : /Bot\W|Robot|Crawler|Spider/i.test( userAgent )
         } ;
       } ;
       
-      /* validate */ validate && validate.test( '2.7', 1, 0, 'font' ) ;
-      FONT : {
-        if ( plugin_data[ 1 ] && plugin_data[ 1 ].response.font && ( !settings.options || !settings.options.font ) ) {
-          jQuery.extend( true , response.font , plugin_data[ 1 ].response.font ) ;
+      FONT: {
+        if ( response.font && ( !setting.option || !setting.option.font && !setting.option.userAgent ) ) {
           break FONT ;
         } ;
         
-        if ( !settings.font || !jQuery( 'body' ).length ) { break FONT ; } ;
+        if ( !setting.font || !jQuery( 'body' ).length ) { break FONT ; } ;
         
-        var body , base , element , style , fonts , text , alphanumeric , symbol , lang ;
+        var body, base, element, style, fonts, text, alphanumeric, symbol, lang ;
         
-        fonts = [ 'monospace' , 'fantasy' , 'cursive' , 'sans-serif' , 'serif' ] ;
+        fonts = [ 'monospace', 'fantasy', 'cursive', 'sans-serif', 'serif' ] ;
         
         style = 'font-size: 72px !important; ' +
                 'font-style: normal !important; ' +
@@ -288,15 +403,15 @@
         
         alphanumeric = 'alphanumericmmmmmmmmm1234567890' ;
         
-        symbol = settings.font.symbol ? '_!#$&:;@+-*/%=^\\(){}[]<>' : '' ;
+        symbol = setting.font.symbol ? '_!#$&:;@+-*/%=^\\(){}[]<>' : '' ;
         
         lang = {
-          en : 'environment' ,
+          en : 'environment',
           ja : '環境　かんきょう　カンキョウ'
         } ;
         
         text = alphanumeric + symbol ;
-        for ( var i = 0 , keys = settings.font.lang.split( /\s*,\s*/ ) , key ; key = keys[ i ] ; i++ ) {
+        for ( var i = 0, keys = setting.font.lang.split( /\s*,\s*/ ), key ; key = keys[ i ] ; i++ ) {
           if ( key in lang ) { text += lang[ key ] ; } ;
         } ;
         
@@ -305,29 +420,29 @@
         base[ 1 ] = jQuery( '<pre/>' ).text( text ) ;
         
         body = jQuery( 'body' ) ;
-        body.append( base[ 0 ] , base[ 1 ] ) ;
+        body.append( base[ 0 ], base[ 1 ] ) ;
         for ( var i = 0 ; i + 1 < fonts.length ; i++ ) {
-          base[ 0 ].attr( 'style' , 'font-family: ' + fonts.slice( i + 0 ).join( ', ' ) + ' !important; ' + style ) ;
-          base[ 1 ].attr( 'style' , 'font-family: ' + fonts.slice( i + 1 ).join( ', ' ) + ' !important; ' + style ) ;
+          base[ 0 ].attr( 'style', 'font-family: ' + fonts.slice( i + 0 ).join( ', ' ) + ' !important; ' + style ) ;
+          base[ 1 ].attr( 'style', 'font-family: ' + fonts.slice( i + 1 ).join( ', ' ) + ' !important; ' + style ) ;
           if ( base[ 0 ][ 0 ].offsetWidth !== base[ 1 ][ 0 ].offsetWidth || base[ 0 ][ 0 ].offsetHeight !== base[ 1 ][ 0 ].offsetHeight ) {
           } else {
-            fonts.splice( i-- , 1 ) ;
+            fonts.splice( i--, 1 ) ;
           } ;
         } ;
         
-        base[ 0 ].attr( 'style' , 'font-family: ' + fonts.join( ', ' ) + ' !important; ' + style ) ;
-        base[ 1 ].attr( 'style' , 'font-family: ' + fonts.slice( 1 < fonts.length ? 1 : 0 ).join( ', ' ) + ' !important; ' + style ) ;
+        base[ 0 ].attr( 'style', 'font-family: ' + fonts.join( ', ' ) + ' !important; ' + style ) ;
+        base[ 1 ].attr( 'style', 'font-family: ' + fonts.slice( 1 < fonts.length ? 1 : 0 ).join( ', ' ) + ' !important; ' + style ) ;
         
         style = fonts.join( ', ' ) + ' !important; ' + style ;
-        fonts = settings.font.family.split( /\s*,\s*/ ) ;
-        response.font = { support : '' , support4style : '' , notsupport : '' , notsupport4style : '' } ;
+        fonts = setting.font.family.split( /\s*,\s*/ ) ;
+        response.font = { support: '', support4style: '', notsupport: '', notsupport4style: '' } ;
         
         element = jQuery( '<pre/>' ).text( text ) ;
         body.append( element ) ;
-        for ( var i = 0 , font , font4style ; font4style = fonts[ i ] ; i++ ) {
-          font = font4style.replace( /"|'/g , '' ) ;
-          for ( var j = 0 , len = base.length , source , format ; source = base[ j ] ; j++ ) {
-            element.attr( 'style' , 'font-family: ' + font4style + ', ' + style.slice( !j ? 0 : style.indexOf( ', ' ) + 2 ) ) ;
+        for ( var i = 0, font, font4style ; font4style = fonts[ i ] ; i++ ) {
+          font = font4style.replace( /"|'/g, '' ) ;
+          for ( var j = 0, len = base.length, source, format ; source = base[ j ] ; j++ ) {
+            element.attr( 'style', 'font-family: ' + font4style + ', ' + style.slice( !j ? 0 : style.indexOf( ', ' ) + 2 ) ) ;
             if ( source[ 0 ].offsetWidth !== element[ 0 ].offsetWidth || source[ 0 ].offsetHeight !== element[ 0 ].offsetHeight || response.os.androidos || response.os.ios ) {
               response.font[ font ] = true ;
               response.font.support += ',' + font ;
@@ -352,157 +467,25 @@
         response.font.notsupport = response.font.notsupport.slice( 1 ) ;
         response.font.support4style = response.font.support4style.slice( 1 ) ;
         response.font.notsupport4style = response.font.notsupport4style.slice( 1 ) ;
-        response.font.name = response.font.support.split( /\s*,\s*/ , 2 )[ 0 ] ;
+        response.font.name = response.font.support.split( /\s*,\s*/, 2 )[ 0 ] ;
       } ;
       
-      /* validate */ validate && validate.test( '2.8', 1, 0, 'support' ) ;
-      SUPPORT : {
+      SUPPORT: {
         if ( !response.support ) { break SUPPORT ; } ;
         
         response.support = jQuery.support ;
       } ;
-      jQuery.extend( true , settings.response , response ) ;
-    }
-    
-    function addClass( property , query , key ) {
-      /* validate */ var validate = plugin_data[ 1 ].validate ? plugin_data[ 1 ].validate.clone( { name : 'jquery.clientenv.js' } ) : false ;
-      /* validate */ validate && validate.start() ;
-      /* validate */ validate && validate.test( 1, 1, arguments, 'addClass()' ) ;
-      var fproperty , fquery , classname, result ;
       
-      if ( !this[ 0 ] || !property ) {
-        /* validate */ validate && validate.end() ;
-        return this ;
-      } ;
-      
-      /* validate */ validate && validate.test( 2, 1, 0, 'for' ) ;
-      /* validate */ validate && validate.test( '*', 1, 0, 'for in' ) ;
-      for ( var i = 0 , properties = property.split( /\s+/ ) ; property = properties[ i ] ; i++ ) {
-        /* validate */ validate && validate.test( '*', 1, property, 'for start' ) ;
-        
-        result = format.apply( this , [ property , query ] ) ;
-        /* validate */ validate && validate.test( '++', 1, result, 'fomat' ) ;
-        fproperty = result[ 0 ] ;
-        fquery = result[ 1 ] ;
-        
-        classname = key || fquery || reference.apply( this , [ fproperty , fquery ] ) ;
-        
-        /* validate */ validate && validate.test( '++', 1, [ fproperty, fquery ], 'is( fproperty, fquery )' ) ;
-        if ( this.is( fproperty , fquery ) ) {
-          /* validate */ validate && validate.test( '++', 1, classname, 'true' ) ;
-          !this.not && !classname.indexOf( 'not-' ) || jQuery( this[ 0 ] ).addClass( classname ) ;
-        } else {
-          /* validate */ validate && validate.test( '++', 1, classname, 'false' ) ;
-          if ( fquery === undefined ) {
-            
-            /* validate */ validate && validate.test( '/', 1, 0, 'for end' ) ;
-            continue ;
-          } ;
-          !this.not || jQuery( this[ 0 ] ).addClass( ( classname.indexOf( 'not-' ) ? 'not-' : '' ) + classname ) ;
-        } ;
-        
-        /* validate */ validate && validate.test( '/', 1, 0, 'for end' ) ;
-      } ;
-      /* validate */ validate && validate.test( '/', 1, 0, 'for out' ) ;
-      
-      /* validate */ validate && validate.end() ;
-      return this ;
-    }
-    
-    function removeClass( property , query , key ) {
-      /* validate */ var validate = plugin_data[ 1 ].validate ? plugin_data[ 1 ].validate.clone( { name : 'jquery.clientenv.js' } ) : false ;
-      /* validate */ validate && validate.start() ;
-      /* validate */ validate && validate.test( 1, 1, arguments, 'removeClass()' ) ;
-      var fproperty , fquery , classname, result ;
-      
-      if ( !this[ 0 ] || !property ) {
-        /* validate */ validate && validate.end() ;
-        return this ;
-      } ;
-      
-      /* validate */ validate && validate.test( 2, 1, 0, 'for' ) ;
-      /* validate */ validate && validate.test( '*', 1, 0, 'for in' ) ;
-      for ( var i = 0 , properties = property.split( /\s+/ ) ; property = properties[ i ] ; i++ ) {
-        /* validate */ validate && validate.test( '*', 1, property, 'for start' ) ;
-        
-        result = format.apply( this , [ property , query ] ) ;
-        /* validate */ validate && validate.test( '++', 1, result, 'fomat' ) ;
-        fproperty = result[ 0 ] ;
-        fquery = result[ 1 ] ;
-        
-        classname = key || fquery || reference.apply( this , [ fproperty , fquery ] ) ;
-        
-        /* validate */ validate && validate.test( '++', 1, [ fproperty, fquery ], 'is( fproperty, fquery )' ) ;
-        if ( this.is( fproperty , fquery ) ) {
-          /* validate */ validate && validate.test( '++', 1, classname, 'true' ) ;
-          !this.not && !classname.indexOf( 'not-' ) || jQuery( this[ 0 ] ).removeClass( classname ) ;
-        } else {
-          /* validate */ validate && validate.test( '++', 1, classname, 'false' ) ;
-          if ( fquery === undefined ) {
-            
-            /* validate */ validate && validate.test( '/', 1, 0, 'for end' ) ;
-            continue ;
-          } ;
-          !this.not || jQuery( this[ 0 ] ).removeClass( ( classname.indexOf( 'not-' ) ? 'not-' : '' ) + classname ) ;
-        } ;
-        
-        /* validate */ validate && validate.test( '/', 1, 0, 'for end' ) ;
-      } ;
-      /* validate */ validate && validate.test( '/', 1, 0, 'for out' ) ;
-      
-      /* validate */ validate && validate.end() ;
-      return this ;
-    }
-    
-    function filter( property , query ) {
-      /* validate */ var validate = plugin_data[ 1 ].validate ? plugin_data[ 1 ].validate.clone( { name : 'jquery.clientenv.js' } ) : false ;
-      /* validate */ validate && validate.start() ;
-      /* validate */ validate && validate.test( 1, 1, arguments, 'filter()' ) ;
-      if ( !this.is( property , query ) ) { delete this[ 0 ] ; } ;
-      /* validate */ validate && validate.end() ;
-      return this ;
-    }
-    
-    function is( property , query ) {
-      /* validate */ var validate = plugin_data[ 1 ].validate ? plugin_data[ 1 ].validate.clone( { name : 'jquery.clientenv.js' } ) : false ;
-      /* validate */ validate && validate.start() ;
-      /* validate */ validate && validate.test( 1, 1, arguments, 'is()' ) ;
-      var properties , queries , result = 0 ;
-      
-      properties = property.replace( /"|'/g , '' ).split( /\s*,\s*/ ) ;
-      queries = query === undefined || query === 'name' ? [ 'name' ] : query.replace( /"|'/g , '' ).split( /\s*,\s*/ ) ;
-      /* validate */ validate && validate.test( '*', 1, 0 , 'for in' ) ;
-      for ( var i = 0 , property ; property = properties[ i ] ; i++ ) {
-        if ( !this[ 0 ] ) { break ; } ;
-        for ( var j = 0 , query ; query = queries[ j ] ; j++ ) {
-          /* validate */ validate && validate.test( '*', 1, [ property , query ] , 'for start' ) ;
-          query = format.apply( this , [ property , query ] ) ;
-          /* validate */ validate && validate.test( '++', 1, query , 'format' ) ;
-          property = query[ 0 ] ;
-          query = query[ 1 ] ;
-          
-          /* validate */ validate && validate.test( '++', 1, result , 'reference' ) ;
-          result += reference.apply( this , [ property , query ] ) ? 1 : 0 ;
-          /* validate */ validate && validate.test( '/', 1, result , 'for end' ) ;
-        } ;
-      } ;
-      /* validate */ validate && validate.test( '/', 1, 0 , 'for out' ) ;
-      result = query !== undefined && 0 === query.indexOf( 'not-' ) ? !result : result ;
-      /* validate */ validate && validate.end() ;
-      return Boolean( result ) ;
-    }
-    
-    function format( property , query ) {
-      /* validate */ var validate = plugin_data[ 1 ].validate ? plugin_data[ 1 ].validate.clone( { name : 'jquery.clientenv.js' } ) : false ;
-      /* validate */ validate && validate.start() ;
-      /* validate */ validate && validate.test( 1, 1, arguments, 'format()' ) ;
+      jQuery.extend( true, context, response ) ;
+    },
+    format: function ( property, query ) {
       if ( property in this && query ) {
-        query = query ? query.replace( /(\S+):(\S+)/ , '$2-$1' ) : query ;
-        query = query ? query.replace( /(\w+)-(not-)/ , '$2-$1' ) : query ;
+        query = query ? query.replace( /(\S+):(\S+)/, '$2-$1' ) : query ;
+        query = query ? query.replace( /(\w+)-(not-)/, '$2-$1' ) : query ;
       } else if ( property in this ) {
       } else {
-        property = property ? property.replace( /(\S+):(\S+)/ , '$2-$1' ) : property ;
-        property = property ? property.replace( /(\w+)-(not-)/ , '$2-$1' ) : property ;
+        property = property ? property.replace( /(\S+):(\S+)/, '$2-$1' ) : property ;
+        property = property ? property.replace( /(\w+)-(not-)/, '$2-$1' ) : property ;
         query = [ property.split( /(?:not|lte|lt|gte|gt)-/ ).pop() ][ 0 ] ;
         for ( var i in this ) {
           if ( typeof this[ i ] !== 'object' ) { continue ; } ;
@@ -512,14 +495,12 @@
           } ;
         } ;
       } ;
-      /* validate */ validate && validate.end() ;
-      return [ property , query ] ;
-    }
-    
-    function reference( property , query ) {
-      var queries , list , position = [ undefined , undefined ] , result ;
+      return [ property, query ] ;
+    },
+    reference: function ( property, query ) {
+      var queries, list, position = [ undefined, undefined ], result ;
       
-      queries = query === undefined ? [ query ] : query.replace( /(not|)-?(lte|lt|gte|gt|)-?(\S+)/ , '$3,$2,$1' ).split( ',' ) ;
+      queries = query === undefined ? [ query ] : query.replace( /(not|)-?(lte|lt|gte|gt|)-?(\S+)/, '$3,$2,$1' ).split( ',' ) ;
       queries[ 2 ] = queries[ 2 ] === 'not' ? false : true ;
       
       switch ( true ) {
@@ -535,46 +516,46 @@
           
         case property === 'os' && !queries[ 0 ].indexOf( 'windows' ) :
           list = [
-              'windows8' ,
-              'windowsRT' ,
-              'windows7' ,
-              'windowsVista' ,
-              'windowsServer2003' ,
-              'windowsXP' ,
-              'windowsME' ,
-              'windows2000' ,
-              'windows98' ,
-              'windowsNT' ,
+              'windows8',
+              'windowsRT',
+              'windows7',
+              'windowsVista',
+              'windowsServer2003',
+              'windowsXP',
+              'windowsME',
+              'windows2000',
+              'windows98',
+              'windowsNT',
               'windows95'
           ] ;
           break ;
           
         case property === 'os' && !queries[ 0 ].indexOf( 'osx' ) :
           list = [
-              'osx10.8' ,
-              'osx10.7' ,
-              'osx10.6' ,
-              'osx10.5' ,
-              'osx10.4' ,
-              'osx10.3' ,
-              'osx10.2' ,
-              'osx10.1' ,
+              'osx10.8',
+              'osx10.7',
+              'osx10.6',
+              'osx10.5',
+              'osx10.4',
+              'osx10.3',
+              'osx10.2',
+              'osx10.1',
               'osx10.0'
           ] ;
           break ;
           
         case property === 'browser' && !queries[ 0 ].indexOf( 'ie' ) :
           list = [
-              'ie15' ,
-              'ie14' ,
-              'ie13' ,
-              'ie12' ,
-              'ie11' ,
-              'ie10' ,
-              'ie9' ,
-              'ie8' ,
-              'ie7' ,
-              'ie6' ,
+              'ie15',
+              'ie14',
+              'ie13',
+              'ie12',
+              'ie11',
+              'ie10',
+              'ie9',
+              'ie8',
+              'ie7',
+              'ie6',
               'ie5'
           ] ;
           break ;
@@ -583,7 +564,7 @@
           return undefined ;
       } ;
       
-      for ( var i = 0 , value ; value = list[ i ] ; i++ ) {
+      for ( var i = 0, value ; value = list[ i ] ; i++ ) {
         if ( this[ property ][ 'name' ] === value ) { position[ 0 ] = i ; } ;
         if ( queries[ 0 ] === value ) { position[ 1 ] = i ; } ;
       } ;
@@ -612,27 +593,7 @@
       } ;
       return queries[ 2 ] ? result : !result ;
     }
-    
-    function data() {
-      /* validate */ var validate = plugin_data[ 1 ].validate ? plugin_data[ 1 ].validate.clone( { name : 'jquery.clientenv.js' } ) : false ;
-      /* validate */ validate && validate.start() ;
-      /* validate */ validate && validate.test( 1, 1, arguments, 'data()' ) ;
-      var response = jQuery.extend( true , { userAgent : this.userAgent } , this ) ;
-      delete response[ 0 ] ;
-      
-      /* validate */ validate && validate.test( 2, 1, response, 'response' ) ;
-      /* validate */ validate && validate.end() ;
-      return response ;
-    }
-    
-    function reset( options ) {
-      /* validate */ var validate = plugin_data[ 1 ].validate ? plugin_data[ 1 ].validate.clone( { name : 'jquery.clientenv.js' } ) : false ;
-      /* validate */ validate && validate.start() ;
-      /* validate */ validate && validate.test( 1, 1, arguments, 'reset()' ) ;
-      1 < plugin_data.length && plugin_data.splice( 1 , 1 ) ;
-      clientenv( options ) ;
-      /* validate */ validate && validate.end() ;
-      return 1 < plugin_data.length ? this : undefined ;
-    }
-  }
-} )( jQuery ) ;
+  } ;
+  
+  registrate.apply( this, [].slice.call( arguments ).concat( [ Store ] ) ) ;
+} ) ( jQuery, window, document, void 0 ) ;
