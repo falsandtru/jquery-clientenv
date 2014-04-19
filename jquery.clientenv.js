@@ -4,9 +4,9 @@
  * 
  * ---
  * @Copyright(c) 2013, falsandtru
- * @license MIT  http://opensource.org/licenses/mit-license.php  http://sourceforge.jp/projects/opensource/wiki/licenses%2FMIT_license
- * @version 0.2.0
- * @updated 2014/02/08
+ * @license MIT http://opensource.org/licenses/mit-license.php
+ * @version 0.2.1
+ * @updated 2014/04/19
  * @author falsandtru https://github.com/falsandtru/
  * @CodingConventions Google JavaScript Style Guide
  * ---
@@ -243,8 +243,8 @@
         
         response.os = {
           name              : '',
-          windows8          : /Win(dows )?NT 6\.2/i.test( userAgent ) && 0 > userAgent.indexOf( 'arm' ),
-          windowsRT         : /Win(dows )?NT 6\.2/i.test( userAgent ) && -1 < userAgent.indexOf( 'arm' ),
+          windows8          : /Win(dows )?NT 6\.2/i.test( userAgent ) && !~userAgent.indexOf( 'arm' ),
+          windowsRT         : /Win(dows )?NT 6\.2/i.test( userAgent ) && ~userAgent.indexOf( 'arm' ),
           windows7          : /Win(dows )?NT 6\.1/i.test( userAgent ),
           windowsVista      : /Win(dows )?NT 6\.0/i.test( userAgent ),
           windowsServer2003 : /Win(dows )?NT 5\.2/i.test( userAgent ),
@@ -263,8 +263,8 @@
           'osx10.2'         : /Mac OS X 10[._]2/i.test( userAgent ),
           'osx10.1'         : /Mac OS X 10[._]1/i.test( userAgent ),
           'osx10.0'         : /Mac OS X 10[._]0/i.test( userAgent ),
-          ios               : -1 < userAgent.indexOf( 'iphone os' ) || -1 < userAgent.indexOf( 'like mac OS x' ),
-          androidos         : -1 < userAgent.indexOf( 'android' ),
+          ios               : ~userAgent.indexOf( 'iphone os' ) || ~userAgent.indexOf( 'like mac os x' ),
+          androidos         : ~userAgent.indexOf( 'android' ),
           otherOS           : false
         } ;
         
@@ -280,20 +280,20 @@
         
         response.platform = {
           name         : '',
-          windows      : -1 < userAgent.indexOf( 'windows' ),
-          mac          : -1 < userAgent.indexOf( 'macintosh' ),
-          linux        : -1 < userAgent.indexOf( 'x11' ),
-          android      : -1 < userAgent.indexOf( 'android' ),
-          iphone       : -1 < userAgent.indexOf( 'iphone' ),
-          ipad         : -1 < userAgent.indexOf( 'ipad' ),
-          ipod         : -1 < userAgent.indexOf( 'ipod' ),
-          windowsPhone : -1 < userAgent.indexOf( 'windows phone' ),
-          blackberry   : -1 < userAgent.indexOf( 'blackberry' ),
-          wii          : -1 < userAgent.indexOf( 'nintendo wii' ),
-          ds           : -1 < userAgent.indexOf( 'nitro' ),
-          psp          : -1 < userAgent.indexOf( 'psp' ),
-          ps2          : -1 < userAgent.indexOf( 'ps2' ),
-          ps3          : -1 < userAgent.indexOf( 'playstation 3' ),
+          windows      : ~userAgent.indexOf( 'windows' ),
+          mac          : ~userAgent.indexOf( 'macintosh' ),
+          linux        : ~userAgent.indexOf( 'x11' ),
+          android      : ~userAgent.indexOf( 'android' ),
+          iphone       : ~userAgent.indexOf( 'iphone' ),
+          ipad         : ~userAgent.indexOf( 'ipad' ),
+          ipod         : ~userAgent.indexOf( 'ipod' ),
+          windowsPhone : ~userAgent.indexOf( 'windows phone' ),
+          blackberry   : ~userAgent.indexOf( 'blackberry' ),
+          wii          : ~userAgent.indexOf( 'nintendo wii' ),
+          ds           : ~userAgent.indexOf( 'nitro' ),
+          psp          : ~userAgent.indexOf( 'psp' ),
+          ps2          : ~userAgent.indexOf( 'ps2' ),
+          ps3          : ~userAgent.indexOf( 'playstation 3' ),
           otherPlatform: false
         } ;
         
@@ -310,8 +310,8 @@
         response.hardware = {
           name   : '',
           pc     : response.platform.windows || response.platform.mac,
-          mobile : -1 < userAgent.indexOf( 'mobile' ),
-          tablet : -1 < userAgent.indexOf( 'tablet' ),
+          mobile : ~userAgent.indexOf( 'mobile' ),
+          tablet : ~userAgent.indexOf( 'tablet' ),
           game   : response.platform.wii || response.platform.ds || response.platform.psp || response.platform.ps2 || response.platform.ps3,
           otherHardware: false
         } ;
@@ -329,14 +329,14 @@
         response.browser = {
           name      : '',
           version   : ( userAgent.match( /(?:chrome|firefox|safari|msie|rv|opera(?:\/.+ version)?|version)[\/:\s]([\d.]+)/ ) || [] )[ 1 ],
-          chrome    : -1 < userAgent.indexOf( 'chrome' ),
-          safari    : -1 < userAgent.indexOf( 'safari' ) && 0 > userAgent.indexOf( 'chrome' ),
-          opera     : -1 < userAgent.indexOf( 'opera' ) && !response.platform.wii && !response.platform.ds,
-          firefox   : -1 < userAgent.indexOf( 'firefox' ),
-          mozilla   : -1 < userAgent.indexOf( 'mozilla' ) && 0 > userAgent.indexOf( 'compatible' ) && 0 > userAgent.indexOf( 'webkit' ) && 0 > userAgent.indexOf( 'firefox' ),
-          lunascape : -1 < userAgent.indexOf( 'lunascape' ),
-          sleipnir  : -1 < userAgent.indexOf( 'sleipnir' ),
-          ie        : -1 < userAgent.indexOf( 'msie' ) && 0 > userAgent.indexOf( 'opera' ) || -1 < userAgent.indexOf( 'trident' ) &&  -1 < userAgent.indexOf( 'rv:' ),
+          chrome    : ~userAgent.indexOf( 'chrome' ),
+          safari    : ~userAgent.indexOf( 'safari' ) && !~userAgent.indexOf( 'chrome' ),
+          opera     : ~userAgent.indexOf( 'opera' ) && !response.platform.wii && !response.platform.ds,
+          firefox   : ~userAgent.indexOf( 'firefox' ),
+          mozilla   : ~userAgent.indexOf( 'mozilla' ) && !~userAgent.indexOf( 'compatible' ) && !~userAgent.indexOf( 'webkit' ) && !~userAgent.indexOf( 'firefox' ),
+          lunascape : ~userAgent.indexOf( 'lunascape' ),
+          sleipnir  : ~userAgent.indexOf( 'sleipnir' ),
+          ie        : ~userAgent.indexOf( 'msie' ) && !~userAgent.indexOf( 'opera' ) || ~userAgent.indexOf( 'trident' ) && ~userAgent.indexOf( 'rv:' ),
           otherBrowser: false
         } ;
         
@@ -367,7 +367,7 @@
 
         response.attribute = {
           name  : '',
-          touch : -1 < userAgent.indexOf( 'touch' ) ||
+          touch : ~userAgent.indexOf( 'touch' ) ||
                        response.hardware.tablet ||
                        response.platform.iphone ||
                        response.platform.ipad ||
@@ -504,7 +504,7 @@
       queries[ 2 ] = queries[ 2 ] === 'not' ? false : true ;
       
       switch ( true ) {
-        case !query || 0 > query.indexOf( '-' ) :
+        case !query || !~query.indexOf( '-' ) :
           query = query ? query : 'name' ;
           if ( this[ property ] && query in this[ property ] ) {
             result = this[ property ][ query ] ;
